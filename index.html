@@ -28,7 +28,7 @@
         </div>
         <div>
           <h1 class="text-base sm:text-lg font-bold text-white leading-tight">Indian Stock Radar</h1>
-          <p class="text-xs text-slate-400">NSE Daily Intraday (MIS) &amp; CNC Delivery • 11-Module Research Terminal</p>
+          <p class="text-xs text-slate-400">NSE Daily Intraday (MIS) &amp; CNC Delivery • NSE Daily Intraday &amp; CNC Terminal</p>
         </div>
       </div>
 
@@ -211,7 +211,8 @@
       { id: "alerts", label: "9. Price Alerts", icon: "bell" },
       { id: "earnings", label: "10. Earnings Analyst", icon: "bar-chart-3" },
       { id: "smartmoney", label: "11. FII/DII Tracker", icon: "landmark" },
-      { id: "mybuys", label: "12. My Buy Prices", icon: "bookmark-check" }
+      { id: "mybuys", label: "12. My Buy Prices", icon: "bookmark-check" },
+      { id: "ranges", label: "13. Price-Range Top 10", icon: "layers" }
     ];
 
     let appData = structuredClone(DEFAULT_DATA);
@@ -786,6 +787,95 @@
     }
     let myBuys = loadMyBuys();
 
+    
+    const PRICE_RANGES = [
+      "Below ₹100", "₹101 – ₹200", "₹201 – ₹300", "₹301 – ₹400", "₹401 – ₹500",
+      "₹501 – ₹600", "₹601 – ₹700", "₹701 – ₹800", "₹801 – ₹900", "₹901 – ₹1000"
+    ];
+    let selectedRange = "Below ₹100";
+    let rangeDeliveryFilter = "ALL";
+
+    function getRangeBucket(price) {
+      if (price <= 100) return "Below ₹100";
+      if (price <= 200) return "₹101 – ₹200";
+      if (price <= 300) return "₹201 – ₹300";
+      if (price <= 400) return "₹301 – ₹400";
+      if (price <= 500) return "₹401 – ₹500";
+      if (price <= 600) return "₹501 – ₹600";
+      if (price <= 700) return "₹601 – ₹700";
+      if (price <= 800) return "₹701 – ₹800";
+      if (price <= 900) return "₹801 – ₹900";
+      if (price <= 1000) return "₹901 – ₹1000";
+      return null;
+    }
+
+    function renderRanges() {
+      const rp = appData.range_picks || {};
+      let list = rp[selectedRange] || appData.stocks.filter(s => getRangeBucket(s.price) === selectedRange);
+      if (rangeDeliveryFilter === "DIP") list = list.filter(s => s.rsi14 < 45);
+      else if (rangeDeliveryFilter === "BREAKOUT") list = list.filter(s => s.vol_ratio >= 1.4);
+      else if (rangeDeliveryFilter === "TREND") list = list.filter(s => s.price >= s.ema200);
+      return `
+        <div class="glass-card rounded-xl p-4 space-y-4">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <h2 class="text-sm font-semibold text-white">Daily Top 10 Picks by Price Range (Up to ₹1,000)</h2>
+              <p class="text-xs text-slate-400">Auto-ranked twice daily across 150+ liquid NSE stocks by RSI, EMA trend &amp; volume.</p>
+            </div>
+            <span class="text-xs px-2.5 py-1 rounded-full bg-indigo-500/20 text-indigo-300 font-semibold">${selectedRange}</span>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-1.5 pb-1">
+            <span class="text-[11px] text-slate-400 mr-1">Delivery Filter:</span>
+            <button data-df="ALL" class="df-btn px-2.5 py-1 rounded-md text-[11px] font-medium ${rangeDeliveryFilter === 'ALL' ? 'bg-indigo-600 text-white' : 'bg-slate-900 text-slate-300 border border-slate-800'}">All Picks</button>
+            <button data-df="DIP" class="df-btn px-2.5 py-1 rounded-md text-[11px] font-medium ${rangeDeliveryFilter === 'DIP' ? 'bg-indigo-600 text-white' : 'bg-slate-900 text-slate-300 border border-slate-800'}">Dip Buys (RSI &lt; 45)</button>
+            <button data-df="BREAKOUT" class="df-btn px-2.5 py-1 rounded-md text-[11px] font-medium ${rangeDeliveryFilter === 'BREAKOUT' ? 'bg-indigo-600 text-white' : 'bg-slate-900 text-slate-300 border border-slate-800'}">Volume Spike (&ge; 1.4x)</button>
+            <button data-df="TREND" class="df-btn px-2.5 py-1 rounded-md text-[11px] font-medium ${rangeDeliveryFilter === 'TREND' ? 'bg-indigo-600 text-white' : 'bg-slate-900 text-slate-300 border border-slate-800'}">Above 200 EMA</button>
+          </div>
+          <div class="flex flex-wrap gap-1.5">
+            ${PRICE_RANGES.map(r => `
+              <button data-range="${r}" class="range-btn px-2.5 py-1.5 rounded-lg text-xs font-medium border transition ${selectedRange === r ? 'bg-emerald-600 text-white border-emerald-500' : 'bg-slate-900 text-slate-300 border-slate-800 hover:bg-slate-800'}">${r}</button>
+            `).join("")}
+          </div>
+
+          <div class="overflow-x-auto">
+            ${list.length === 0 ? '<p class="text-xs text-slate-400 py-4">Run the updated GitHub Action once to populate all 10 price brackets from 150+ NSE stocks.</p>' : `
+              <table class="w-full text-left text-xs">
+                <thead class="text-slate-400 border-b border-slate-800">
+                  <tr>
+                    <th class="py-2 pr-3">#</th>
+                    <th class="py-2 pr-3">Symbol</th>
+                    <th class="py-2 px-2">LTP (₹)</th>
+                    <th class="py-2 px-2">Chg %</th>
+                    <th class="py-2 px-2">RSI(14)</th>
+                    <th class="py-2 px-2">Buy Zone</th>
+                    <th class="py-2 px-2">Target 1</th>
+                    <th class="py-2 px-2">Stop-Loss</th>
+                    <th class="py-2 pl-2">Setup</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-800">
+                  ${list.slice(0, 10).map((s, idx) => `
+                    <tr>
+                      <td class="py-2.5 pr-3 text-slate-400 font-semibold">${idx + 1}</td>
+                      <td class="py-2.5 pr-3 font-bold text-white">${s.symbol}</td>
+                      <td class="py-2.5 px-2 font-semibold text-slate-100">₹${Number(s.price).toFixed(2)}</td>
+                      <td class="py-2.5 px-2 font-medium ${s.change_pct >= 0 ? 'text-emerald-400' : 'text-rose-400'}">${s.change_pct >= 0 ? '+' : ''}${Number(s.change_pct).toFixed(2)}%</td>
+                      <td class="py-2.5 px-2">${Number(s.rsi14).toFixed(1)}</td>
+                      <td class="py-2.5 px-2 text-emerald-300 font-medium">${s.buy_zone}</td>
+                      <td class="py-2.5 px-2 text-sky-300">₹${Number(s.target1).toFixed(2)}</td>
+                      <td class="py-2.5 px-2 text-rose-400">₹${Number(s.stop_loss).toFixed(2)}</td>
+                      <td class="py-2.5 pl-2 text-slate-300">${s.setup}</td>
+                    </tr>
+                  `).join("")}
+                </tbody>
+              </table>
+            `}
+          </div>
+        </div>
+      `;
+    }
+
     function renderMyBuys() {
       return `
         <div class="glass-card rounded-xl p-4 space-y-4">
@@ -1057,6 +1147,22 @@
       }
 
       
+      
+      if (activeTab === "ranges") {
+        document.querySelectorAll(".df-btn").forEach(btn => {
+          btn.addEventListener("click", () => {
+            rangeDeliveryFilter = btn.dataset.df;
+            renderModule();
+          });
+        });
+        document.querySelectorAll(".range-btn").forEach(btn => {
+          btn.addEventListener("click", () => {
+            selectedRange = btn.dataset.range;
+            renderModule();
+          });
+        });
+      }
+
       if (activeTab === "mybuys") {
         document.getElementById("mb-add").addEventListener("click", () => {
           const symbol = document.getElementById("mb-sym").value.trim().toUpperCase();
@@ -1119,6 +1225,7 @@
       else if (activeTab === "earnings") view.innerHTML = renderEarnings(stocks.length ? stocks : appData.stocks);
       else if (activeTab === "smartmoney") view.innerHTML = renderSmartMoney();
       else if (activeTab === "mybuys") view.innerHTML = renderMyBuys();
+      else if (activeTab === "ranges") view.innerHTML = renderRanges();
 
       lucide.createIcons();
       attachModuleEvents(stocks.length ? stocks : appData.stocks);
@@ -1151,6 +1258,7 @@
           const parsed = JSON.parse(ev.target.result);
           if (parsed && Array.isArray(parsed.stocks)) {
             appData = parsed;
+            chatMessages = [];
             if (appData.meta && appData.meta.updated_ist) {
               document.getElementById("last-updated-text").textContent = "Updated: " + appData.meta.updated_ist;
             }
@@ -1178,6 +1286,7 @@
           const parsed = await res.json();
           if (parsed && Array.isArray(parsed.stocks)) {
             appData = parsed;
+            chatMessages = [];
             if (appData.meta && appData.meta.updated_ist) {
               document.getElementById("last-updated-text").textContent = "Updated: " + appData.meta.updated_ist;
             }
