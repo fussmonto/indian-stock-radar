@@ -253,10 +253,54 @@ def scan_price_ranges():
         time.sleep(1.5)
 
     for label in buckets:
-        buckets[label] = sorted(buckets[label], key=lambda x: x["_score"], reverse=True)[:10]
-        for item in buckets[label]:
+        candidates = sorted(buckets[label], key=lambda x: x["_score"], reverse=True)[:22]
+        filtered = []
+        for item in candidates:
+            lt_score = item.get("_score", 0.0)
+            try:
+                info = yf.Ticker(f"{item['symbol']}.NS").info or {}
+                pe = info.get("trailingPE")
+                roe = info.get("returnOnEquity")
+                rev_g = info.get("revenueGrowth")
+                earn_g = info.get("earningsGrowth")
+                de = info.get("debtToEquity")
+                margin = info.get("profitMargins")
+                div_y = info.get("dividendYield")
+                sector = info.get("sector", "NSE")
+
+                if pe is not None and (pe <= 0 or pe > 48):
+                    continue
+                if roe is not None and roe < 0.08:
+                    continue
+                if margin is not None and margin < 0.03:
+                    continue
+                if de is not None and "Financial" not in str(sector) and de > 150:
+                    continue
+
+                if rev_g is not None and rev_g > 0.10:
+                    lt_score += 15
+                if earn_g is not None and earn_g > 0.10:
+                    lt_score += 15
+                if roe is not None and roe >= 0.15:
+                    lt_score += 12
+
+                item["sector"] = sector
+                item["pe"] = round(float(pe), 2) if pe else 0.0
+                item["roe"] = round(float(roe) * 100, 2) if roe else 0.0
+                item["div_yield"] = round(float(div_y) * 100, 2) if div_y else 0.0
+                rev_pct = f"+{round(rev_g * 100, 1)}%" if rev_g else "N/A"
+                de_txt = f"D/E {round(de / 100, 2)}" if de is not None else "Low/NA Debt"
+                item["earnings_note"] = f"Rev Growth: {rev_pct} | {de_txt} | Div: {item['div_yield']}%"
+            except Exception:
+                pass
+            item["_lt_score"] = lt_score
             item.pop("_score", None)
             item.pop("_avg_vol", None)
+            filtered.append(item)
+        filtered = sorted(filtered, key=lambda x: x.get("_lt_score", 0), reverse=True)[:10]
+        for f_item in filtered:
+            f_item.pop("_lt_score", None)
+        buckets[label] = filtered
     return buckets
 
 
@@ -371,7 +415,7 @@ def main():
         json.dump(report, f, indent=2, ensure_ascii=False)
     write_daily_markdown(report)
     send_telegram_alert(report)
-    print(f"Updated {len(stocks)} watchlist + Nifty 500 range scan at {report['meta']['updated_ist']}")
+    print(f"Updated {len(stocks)} watchlist + all NSE range scan at {report['meta']['updated_ist']}")
 
 
 if __name__ == "__main__":
