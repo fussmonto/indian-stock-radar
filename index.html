@@ -851,7 +851,8 @@
                     <th class="py-2 px-2">Buy Zone</th>
                     <th class="py-2 px-2">Target 1</th>
                     <th class="py-2 px-2">Stop-Loss</th>
-                    <th class="py-2 pl-2">Setup</th>
+                    <th class="py-2 px-2">P/E / ROE</th>
+                    <th class="py-2 pl-2">Setup &amp; Fundamentals</th>
                   </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-800">
@@ -865,7 +866,8 @@
                       <td class="py-2.5 px-2 text-emerald-300 font-medium">${s.buy_zone}</td>
                       <td class="py-2.5 px-2 text-sky-300">₹${Number(s.target1).toFixed(2)}</td>
                       <td class="py-2.5 px-2 text-rose-400">₹${Number(s.stop_loss).toFixed(2)}</td>
-                      <td class="py-2.5 pl-2 text-slate-300">${s.setup}</td>
+                      <td class="py-2.5 px-2 text-slate-300">${s.pe ? s.pe : "—"} / ${s.roe ? s.roe + "%" : "—"}</td>
+                      <td class="py-2.5 pl-2 text-slate-300">${s.setup}<div class="text-[10px] text-slate-400">${s.earnings_note || ""}</div></td>
                     </tr>
                   `).join("")}
                 </tbody>
