@@ -3,6 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0b0f19" />
+  <link rel="manifest" href="./manifest.json" />
   <title>Indian Stock Radar — Daily Intraday &amp; CNC Delivery Terminal</title>
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
@@ -197,6 +199,7 @@
     };
 
     const MODULES = [
+      { id: "assistant", label: "AI Brief & CNC Picks", icon: "sparkles" },
       { id: "scanner", label: "1. Chart Scanner", icon: "scan-line" },
       { id: "news", label: "2. News Monitor", icon: "newspaper" },
       { id: "entry", label: "3. Entry Timer", icon: "crosshair" },
@@ -207,11 +210,12 @@
       { id: "order", label: "8. Order Ticket", icon: "send" },
       { id: "alerts", label: "9. Price Alerts", icon: "bell" },
       { id: "earnings", label: "10. Earnings Analyst", icon: "bar-chart-3" },
-      { id: "smartmoney", label: "11. FII/DII Tracker", icon: "landmark" }
+      { id: "smartmoney", label: "11. FII/DII Tracker", icon: "landmark" },
+      { id: "mybuys", label: "12. My Buy Prices", icon: "bookmark-check" }
     ];
 
     let appData = structuredClone(DEFAULT_DATA);
-    let activeTab = "scanner";
+    let activeTab = "assistant";
     let activeMode = "ALL";
     let searchQuery = "";
     let selectedSymbol = "SUZLON";
@@ -270,6 +274,115 @@
         });
       });
       lucide.createIcons();
+    }
+
+    
+    let chatMessages = [];
+
+    function getDailyCncPicks() {
+      return appData.stocks
+        .filter(s => s.mode === "CNC" || s.rsi14 < 58)
+        .slice()
+        .sort((a, b) => {
+          const scoreA = (a.rsi14 >= 35 && a.rsi14 <= 58 ? 20 : 0) + (a.price >= a.ema200 ? 10 : 0) + a.vol_ratio * 5;
+          const scoreB = (b.rsi14 >= 35 && b.rsi14 <= 58 ? 20 : 0) + (b.price >= b.ema200 ? 10 : 0) + b.vol_ratio * 5;
+          return scoreB - scoreA;
+        });
+    }
+
+    function generateAssistantReply(promptText) {
+      const q = promptText.toLowerCase();
+      const picks = getDailyCncPicks();
+      const matchedStock = appData.stocks.find(s => q.includes(s.symbol.toLowerCase()));
+      if (matchedStock) {
+        return `${matchedStock.symbol} (${matchedStock.name}) is at ₹${matchedStock.price.toFixed(2)} (${matchedStock.change_pct >= 0 ? '+' : ''}${matchedStock.change_pct.toFixed(2)}%). Ideal Buy Zone: ${matchedStock.buy_zone} | Breakout above ₹${matchedStock.breakout_trigger.toFixed(2)} | Stop-Loss: ₹${matchedStock.stop_loss.toFixed(2)} | Targets: ₹${matchedStock.target1.toFixed(2)} / ₹${matchedStock.target2.toFixed(2)}. Setup: ${matchedStock.setup}.`;
+      }
+      if (q.includes("intraday") || q.includes("mis")) {
+        const intra = appData.stocks.filter(s => s.mode === "INTRADAY");
+        if (!intra.length) return "No Intraday MIS setups matched in the current dataset.";
+        return "Top Intraday (MIS) Setups Today:\n" + intra.map(s => `• ${s.symbol} (₹${s.price.toFixed(2)}): Buy ${s.buy_zone} or above ₹${s.breakout_trigger.toFixed(2)}, SL ₹${s.stop_loss.toFixed(2)}, T1 ₹${s.target1.toFixed(2)} (${s.setup})`).join("\n");
+      }
+      if (q.includes("oversold") || q.includes("dip") || q.includes("cheap") || q.includes("under")) {
+        const dips = appData.stocks.filter(s => s.rsi14 < 48 || s.price < 100);
+        return "Oversold / Under-₹100 Watchlist:\n" + dips.map(s => `• ${s.symbol} at ₹${s.price.toFixed(2)} (RSI ${s.rsi14.toFixed(1)}): Buy Zone ${s.buy_zone}, SL ₹${s.stop_loss.toFixed(2)}, T1 ₹${s.target1.toFixed(2)}`).join("\n");
+      }
+      return "Today's Top Normal CNC Delivery Picks (Updated " + appData.meta.updated_ist + "):\n" +
+        picks.slice(0, 4).map(s => `• ${s.symbol} — Current ₹${s.price.toFixed(2)} | Buy Price: ${s.buy_zone} | SL: ₹${s.stop_loss.toFixed(2)} | Target: ₹${s.target1.toFixed(2)} (${s.setup})`).join("\n");
+    }
+
+    function renderAssistant() {
+      const picks = getDailyCncPicks();
+      if (chatMessages.length === 0) {
+        chatMessages.push({
+          role: "assistant",
+          text: `Namaste! Here is your ${appData.meta.session} brief (${appData.meta.updated_ist}). NIFTY 50 is at ${appData.meta.nifty50.price.toLocaleString('en-IN')} (${appData.meta.nifty50.change_pct >= 0 ? '+' : ''}${appData.meta.nifty50.change_pct}%). Ask me about any NSE ticker, Intraday MIS setups, or today's CNC Delivery buy prices below.`
+        });
+      }
+      return `
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+          <!-- ChatGPT-style Assistant -->
+          <div class="lg:col-span-2 glass-card rounded-xl p-4 flex flex-col justify-between min-h-[420px]">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-3">
+              <div class="flex items-center gap-2">
+                <div class="w-7 h-7 rounded-full bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400">
+                  <i data-lucide="bot" class="w-4 h-4"></i>
+                </div>
+                <div>
+                  <h2 class="text-sm font-semibold text-white">Market AI Assistant</h2>
+                  <p class="text-[11px] text-slate-400">ChatGPT-style daily NSE brief &amp; ticker Q&amp;A</p>
+                </div>
+              </div>
+              <span class="text-[11px] px-2 py-0.5 rounded bg-slate-800 text-emerald-300">Live JSON Linked</span>
+            </div>
+
+            <div id="chat-thread" class="space-y-3 overflow-y-auto max-h-72 pr-1 scrollbar-thin mb-3">
+              ${chatMessages.map(m => `
+                <div class="flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}">
+                  <div class="max-w-[88%] rounded-xl px-3.5 py-2.5 text-xs leading-relaxed whitespace-pre-line ${m.role === 'user' ? 'bg-emerald-600 text-white' : 'bg-slate-900 border border-slate-800 text-slate-200'}">${m.text}</div>
+                </div>
+              `).join("")}
+            </div>
+
+            <div class="space-y-2.5 pt-2 border-t border-slate-800">
+              <div class="flex flex-wrap gap-1.5">
+                <button data-q="What are today's best CNC delivery stocks to buy?" class="ai-chip px-2.5 py-1 rounded-full text-[11px] bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition">Best CNC Delivery Picks</button>
+                <button data-q="Show Intraday MIS setups" class="ai-chip px-2.5 py-1 rounded-full text-[11px] bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition">Intraday MIS Setups</button>
+                <button data-q="Show oversold under ₹100 stocks" class="ai-chip px-2.5 py-1 rounded-full text-[11px] bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition">Under ₹100 Dip Buys</button>
+                <button data-q="Analyze SUZLON" class="ai-chip px-2.5 py-1 rounded-full text-[11px] bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition">Analyze SUZLON</button>
+              </div>
+              <div class="flex gap-2">
+                <input id="ai-input" type="text" placeholder="Ask about any NSE stock (e.g. NHPC, SUZLON, CNC picks)..." class="flex-1 px-3 py-2 rounded-lg bg-slate-900 border border-slate-700 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500" />
+                <button id="ai-send" class="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold transition">Ask</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Daily Normal CNC Delivery Stocks Card -->
+          <div class="glass-card rounded-xl p-4 space-y-3">
+            <div class="flex items-center justify-between">
+              <h2 class="text-sm font-semibold text-white">Today's CNC Delivery Picks</h2>
+              <span class="text-[10px] px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 font-semibold">Auto-Updated Daily</span>
+            </div>
+            <p class="text-[11px] text-slate-400">Suggested normal delivery buy zones, stop-loss &amp; targets (not SEBI advice):</p>
+            <div class="space-y-2.5">
+              ${picks.slice(0, 5).map(s => `
+                <div class="p-3 rounded-lg bg-slate-900/90 border border-slate-800 space-y-1.5">
+                  <div class="flex items-center justify-between">
+                    <span class="font-bold text-xs text-white">${s.symbol} <span class="font-normal text-slate-400">• ₹${s.price.toFixed(2)}</span></span>
+                    <span class="text-[11px] font-medium ${s.change_pct >= 0 ? 'text-emerald-400' : 'text-rose-400'}">${s.change_pct >= 0 ? '+' : ''}${s.change_pct.toFixed(2)}%</span>
+                  </div>
+                  <div class="grid grid-cols-3 gap-1.5 text-[11px]">
+                    <div class="bg-slate-950 rounded px-2 py-1"><span class="text-slate-400 block">Buy At</span><strong class="text-emerald-300">${s.buy_zone}</strong></div>
+                    <div class="bg-slate-950 rounded px-2 py-1"><span class="text-slate-400 block">Target 1</span><strong class="text-sky-300">₹${s.target1.toFixed(2)}</strong></div>
+                    <div class="bg-slate-950 rounded px-2 py-1"><span class="text-slate-400 block">Stop-Loss</span><strong class="text-rose-400">₹${s.stop_loss.toFixed(2)}</strong></div>
+                  </div>
+                  <div class="text-[10px] text-slate-400">${s.setup}</div>
+                </div>
+              `).join("")}
+            </div>
+          </div>
+        </div>
+      `;
     }
 
     function renderScanner(stocks) {
@@ -658,6 +771,85 @@
       `;
     }
 
+    
+    function loadMyBuys() {
+      try {
+        const raw = localStorage.getItem("isr_mybuys_v1");
+        return raw ? JSON.parse(raw) : [
+          { id: 1, symbol: "SUZLON", targetBuy: 36.80, boughtPrice: 0, qty: 0, note: "CNC Dip Zone" },
+          { id: 2, symbol: "NHPC", targetBuy: 76.50, boughtPrice: 75.20, qty: 50, note: "Holding CNC" }
+        ];
+      } catch (e) { return []; }
+    }
+    function saveMyBuys(list) {
+      try { localStorage.setItem("isr_mybuys_v1", JSON.stringify(list)); } catch (e) {}
+    }
+    let myBuys = loadMyBuys();
+
+    function renderMyBuys() {
+      return `
+        <div class="glass-card rounded-xl p-4 space-y-4">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <h2 class="text-sm font-semibold text-white">My Custom Buy Prices &amp; CNC Portfolio Tracker</h2>
+              <p class="text-xs text-slate-400">Set your own buy price for any stock directly on your phone (saved locally).</p>
+            </div>
+            <span class="text-xs px-2.5 py-1 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">${myBuys.length} Tracked</span>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-6 gap-2 text-xs">
+            <input id="mb-sym" type="text" placeholder="Symbol (e.g. SUZLON)" class="px-2.5 py-2 rounded-lg bg-slate-900 border border-slate-700 text-white uppercase" />
+            <input id="mb-buy" type="number" step="0.05" placeholder="Target Buy ₹" class="px-2.5 py-2 rounded-lg bg-slate-900 border border-slate-700 text-white" />
+            <input id="mb-held" type="number" step="0.05" placeholder="Bought ₹ (optional)" class="px-2.5 py-2 rounded-lg bg-slate-900 border border-slate-700 text-white" />
+            <input id="mb-qty" type="number" step="1" placeholder="Qty (optional)" class="px-2.5 py-2 rounded-lg bg-slate-900 border border-slate-700 text-white" />
+            <input id="mb-note" type="text" placeholder="Note" class="px-2.5 py-2 rounded-lg bg-slate-900 border border-slate-700 text-white" />
+            <button id="mb-add" class="px-3 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-semibold">Save Stock</button>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+              <thead class="text-slate-400 border-b border-slate-800">
+                <tr>
+                  <th class="py-2 pr-3">Ticker</th>
+                  <th class="py-2 px-2">Live LTP</th>
+                  <th class="py-2 px-2">My Buy Price</th>
+                  <th class="py-2 px-2">Status</th>
+                  <th class="py-2 px-2">Holding P&amp;L</th>
+                  <th class="py-2 pl-2">Action</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-800">
+                ${myBuys.map(item => {
+                  const match = appData.stocks.find(s => s.symbol.toUpperCase() === item.symbol.toUpperCase());
+                  const ltp = match ? match.price : null;
+                  const ready = ltp !== null && ltp <= Number(item.targetBuy);
+                  const pnl = (ltp !== null && item.boughtPrice > 0 && item.qty > 0)
+                    ? (ltp - item.boughtPrice) * item.qty
+                    : null;
+                  return `
+                    <tr>
+                      <td class="py-2.5 pr-3 font-bold text-white">${item.symbol.toUpperCase()}<div class="text-[10px] font-normal text-slate-400">${item.note || ''}</div></td>
+                      <td class="py-2.5 px-2">${ltp !== null ? '₹' + ltp.toFixed(2) : 'Not in JSON'}</td>
+                      <td class="py-2.5 px-2 font-semibold text-sky-300">₹${Number(item.targetBuy).toFixed(2)}</td>
+                      <td class="py-2.5 px-2">
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold ${ready ? 'bg-emerald-500/20 text-emerald-300' : 'bg-slate-800 text-slate-400'}">
+                          ${ltp === null ? 'Watchlist Only' : (ready ? 'READY TO BUY' : 'Above Target')}
+                        </span>
+                      </td>
+                      <td class="py-2.5 px-2 font-medium ${pnl === null ? 'text-slate-500' : (pnl >= 0 ? 'text-emerald-400' : 'text-rose-400')}">
+                        ${pnl === null ? '—' : (pnl >= 0 ? '+₹' : '-₹') + Math.abs(Math.round(pnl)).toLocaleString('en-IN')}
+                      </td>
+                      <td class="py-2.5 pl-2"><button data-id="${item.id}" class="mb-del text-rose-400 hover:text-rose-300">Delete</button></td>
+                    </tr>
+                  `;
+                }).join("")}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+    }
+
     function renderSmartMoney() {
       return `
         <div class="glass-card rounded-xl p-4 space-y-4">
@@ -684,6 +876,28 @@
     }
 
     function attachModuleEvents(stocks) {
+      
+      if (activeTab === "assistant") {
+        const sendPrompt = (text) => {
+          const clean = text.trim();
+          if (!clean) return;
+          chatMessages.push({ role: "user", text: clean });
+          chatMessages.push({ role: "assistant", text: generateAssistantReply(clean) });
+          renderModule();
+          const thread = document.getElementById("chat-thread");
+          if (thread) thread.scrollTop = thread.scrollHeight;
+        };
+        document.getElementById("ai-send").addEventListener("click", () => {
+          sendPrompt(document.getElementById("ai-input").value);
+        });
+        document.getElementById("ai-input").addEventListener("keydown", (e) => {
+          if (e.key === "Enter") sendPrompt(e.target.value);
+        });
+        document.querySelectorAll(".ai-chip").forEach(btn => {
+          btn.addEventListener("click", () => sendPrompt(btn.dataset.q));
+        });
+      }
+
       if (activeTab === "scanner") {
         document.querySelectorAll(".stock-row").forEach(row => {
           row.addEventListener("click", () => {
@@ -842,6 +1056,30 @@
         updateTicket();
       }
 
+      
+      if (activeTab === "mybuys") {
+        document.getElementById("mb-add").addEventListener("click", () => {
+          const symbol = document.getElementById("mb-sym").value.trim().toUpperCase();
+          const targetBuy = parseFloat(document.getElementById("mb-buy").value);
+          const boughtPrice = parseFloat(document.getElementById("mb-held").value) || 0;
+          const qty = parseInt(document.getElementById("mb-qty").value, 10) || 0;
+          const note = document.getElementById("mb-note").value.trim();
+          if (!symbol || !targetBuy || targetBuy <= 0) { showToast("Enter symbol and valid target buy price"); return; }
+          myBuys.unshift({ id: Date.now(), symbol, targetBuy, boughtPrice, qty, note });
+          saveMyBuys(myBuys);
+          showToast(`Saved ${symbol} @ ₹${targetBuy.toFixed(2)}`);
+          renderModule();
+        });
+        document.querySelectorAll(".mb-del").forEach(btn => {
+          btn.addEventListener("click", () => {
+            const id = Number(btn.dataset.id);
+            myBuys = myBuys.filter(x => x.id !== id);
+            saveMyBuys(myBuys);
+            renderModule();
+          });
+        });
+      }
+
       if (activeTab === "alerts") {
         document.getElementById("al-add").addEventListener("click", () => {
           const symbol = document.getElementById("al-sym").value;
@@ -868,7 +1106,8 @@
     function renderModule() {
       const stocks = getFilteredStocks();
       const view = document.getElementById("module-view");
-      if (activeTab === "scanner") view.innerHTML = renderScanner(stocks.length ? stocks : appData.stocks);
+      if (activeTab === "assistant") view.innerHTML = renderAssistant();
+      else if (activeTab === "scanner") view.innerHTML = renderScanner(stocks.length ? stocks : appData.stocks);
       else if (activeTab === "news") view.innerHTML = renderNews();
       else if (activeTab === "entry") view.innerHTML = renderEntry(stocks.length ? stocks : appData.stocks);
       else if (activeTab === "exit") view.innerHTML = renderExit(stocks.length ? stocks : appData.stocks);
@@ -879,6 +1118,7 @@
       else if (activeTab === "alerts") view.innerHTML = renderAlerts();
       else if (activeTab === "earnings") view.innerHTML = renderEarnings(stocks.length ? stocks : appData.stocks);
       else if (activeTab === "smartmoney") view.innerHTML = renderSmartMoney();
+      else if (activeTab === "mybuys") view.innerHTML = renderMyBuys();
 
       lucide.createIcons();
       attachModuleEvents(stocks.length ? stocks : appData.stocks);
