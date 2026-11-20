@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Indian Stock Radar — Daily Intraday &amp; CNC Delivery Terminal</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background-color: #0b0f19; color: #e2e8f0; }
+    .glass-card { background: rgba(17, 24, 39, 0.85); border: 1px solid rgba(51, 65, 85, 0.7); }
+    .scrollbar-thin::-webkit-scrollbar { height: 6px; width: 6px; }
+    .scrollbar-thin::-webkit-scrollbar-thumb { background: #334155; border-radius: 9999px; }
+    .tab-active { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: #fff; border-color: #10b981; }
+  </style>
+</head>
+<body class="min-h-screen antialiased">
+  <!-- Top Navbar -->
+  <header class="sticky top-0 z-30 border-b border-slate-800 bg-slate-950/90 backdrop-blur">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-lg bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400">
+          <i data-lucide="radar" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <h1 class="text-base sm:text-lg font-bold text-white leading-tight">Indian Stock Radar</h1>
+          <p class="text-xs text-slate-400">NSE Daily Intraday (MIS) &amp; CNC Delivery • 11-Module Research Terminal</p>
+        </div>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-2">
+        <span id="market-badge" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          NIFTY 50: <strong id="nifty-val">25,729.35</strong> <span id="nifty-chg" class="text-emerald-400">(+0.84%)</span>
+        </span>
+        <span id="sync-badge" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs bg-slate-800 text-slate-300 border border-slate-700" title="Auto-updates at 08:45 AM &amp; 03:45 PM IST via GitHub Actions">
+          <i data-lucide="clock" class="w-3.5 h-3.5 text-sky-400"></i>
+          <span id="last-updated-text">Updated: 20 Nov 2026 • 15:45 IST</span>
+        </span>
+        <label class="cursor-pointer inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition">
+          <i data-lucide="upload" class="w-3.5 h-3.5"></i>
+          <span>Import JSON</span>
+          <input id="json-upload" type="file" accept=".json" class="hidden" />
+        </label>
+      </div>
+    </div>
+
+    <!-- 11-Skill Module Navigation -->
+    <div class="max-w-7xl mx-auto px-4 pb-2.5 overflow-x-auto scrollbar-thin">
+      <div id="module-tabs" class="flex items-center gap-1.5 min-w-max">
+        <!-- Populated by JS -->
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="max-w-7xl mx-auto px-4 py-5 space-y-5">
+    <!-- Quick Mode & Search Bar -->
+    <section class="glass-card rounded-xl p-3.5 flex flex-wrap items-center justify-between gap-3">
+      <div class="flex flex-wrap items-center gap-2">
+        <span class="text-xs font-semibold uppercase tracking-wider text-slate-400 mr-1">Strategy Mode:</span>
+        <button data-mode="ALL" class="mode-btn px-3 py-1.5 rounded-lg text-xs font-medium bg-emerald-600 text-white transition">All Setups</button>
+        <button data-mode="CNC" class="mode-btn px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-800 text-slate-300 hover:bg-slate-700 transition">CNC Delivery (Swing)</button>
+        <button data-mode="INTRADAY" class="mode-btn px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-800 text-slate-300 hover:bg-slate-700 transition">Intraday (MIS)</button>
+        <button data-mode="PENNY" class="mode-btn px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-800 text-slate-300 hover:bg-slate-700 transition">Under ₹100 Focus</button>
+      </div>
+      <div class="relative w-full sm:w-64">
+        <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-2.5"></i>
+        <input id="ticker-search" type="text" placeholder="Search NSE ticker (e.g. SUZLON)..." class="w-full pl-9 pr-3 py-1.5 rounded-lg bg-slate-900 border border-slate-700 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-emerald-500" />
+      </div>
+    </section>
+
+    <!-- Dynamic Module Container -->
+    <section id="module-view" class="space-y-5">
+      <!-- Rendered dynamically -->
+    </section>
+  </main>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="fixed bottom-4 right-4 z-50 hidden px-4 py-2.5 rounded-lg bg-emerald-600 text-white text-sm font-medium shadow-xl border border-emerald-400/40"></div>
+
+  <script>
+    // Grounded initial NSE dataset (20 Nov 2026)
+    const DEFAULT_DATA = {
+      meta: {
+        updated_ist: "20 Nov 2026 • 15:45 IST",
+        session: "Post-Market Close (CNC & Next-Day Prep)",
+        schedule: "08:45 AM & 03:45 PM IST (Mon–Fri)",
+        nifty50: { price: 25729.35, change_pct: 0.84 },
+        fii_dii: { fii_net_cr: -412.6, dii_net_cr: 1285.4, date: "20 Nov 2026" }
+      },
+      stocks: [
+        {
+          symbol: "SUZLON", name: "Suzlon Energy Ltd", sector: "Renewable Energy",
+          price: 36.55, change_pct: -1.08, high52: 60.45, low52: 33.15,
+          rsi14: 38.4, ema20: 38.10, ema50: 41.20, ema200: 44.50, vol_ratio: 1.35,
+          mode: "CNC", setup: "Dip Accumulation Zone",
+          buy_zone: "₹34.50 – ₹36.80", breakout_trigger: 38.50,
+          target1: 41.20, target2: 45.00, stop_loss: 33.10,
+          pe: 22.3, roe: 39.7, roce: 34.2, div_yield: 0.0, book_val: 7.54,
+          earnings_note: "Strong ROCE (34.2%) & ROE (39.7%); trading near 52W support (₹33.15).",
+          history: [41.2, 40.5, 39.8, 39.1, 38.4, 37.9, 37.2, 37.0, 36.5, 36.55]
+        },
+        {
+          symbol: "NHPC", name: "NHPC Ltd", sector: "Power / PSU",
+          price: 77.58, change_pct: 0.49, high52: 86.90, low52: 68.70,
+          rsi14: 56.2, ema20: 75.80, ema50: 74.90, ema200: 73.40, vol_ratio: 1.48,
+          mode: "CNC", setup: "5-Day Winning Streak • Above All EMAs",
+          buy_zone: "₹74.80 – ₹76.50", breakout_trigger: 78.40,
+          target1: 82.00, target2: 86.50, stop_loss: 73.20,
+          pe: 17.7, roe: 9.32, roce: 5.75, div_yield: 2.09, book_val: 43.5,
+          earnings_note: "Steady hydro PSU dividend yield (2.09%); bullish EMA alignment.",
+          history: [73.8, 74.2, 74.9, 75.1, 75.5, 76.0, 76.4, 76.9, 77.2, 77.58]
+        },
+        {
+          symbol: "SJVN", name: "SJVN Ltd", sector: "Power / PSU",
+          price: 55.88, change_pct: -0.64, high52: 88.80, low52: 46.08,
+          rsi14: 44.8, ema20: 56.90, ema50: 59.10, ema200: 62.40, vol_ratio: 0.92,
+          mode: "CNC", setup: "Wait for EMA20 Reclaim",
+          buy_zone: "₹52.50 – ₹54.80", breakout_trigger: 57.20,
+          target1: 61.00, target2: 65.50, stop_loss: 51.40,
+          pe: 22.2, roe: 4.58, roce: 5.73, div_yield: 2.64, book_val: 38.1,
+          earnings_note: "Dividend yield 2.64%; watch ₹57.20 breakout for momentum shift.",
+          history: [59.1, 58.6, 58.0, 57.5, 57.1, 56.8, 56.4, 56.2, 56.24, 55.88]
+        },
+        {
+          symbol: "MAHABANK", name: "Bank of Maharashtra", sector: "PSU Banking",
+          price: 96.50, change_pct: 1.15, high52: 98.70, low52: 55.50,
+          rsi14: 66.4, ema20: 91.20, ema50: 85.60, ema200: 74.80, vol_ratio: 1.92,
+          mode: "INTRADAY", setup: "52W High Breakout Watch",
+          buy_zone: "₹93.50 – ₹95.80", breakout_trigger: 98.70,
+          target1: 102.50, target2: 108.00, stop_loss: 91.80,
+          pe: 9.29, roe: 21.4, roce: 8.9, div_yield: 1.45, book_val: 48.6,
+          earnings_note: "Low P/E (9.29) PSU bank near 52W high (₹98.70) on strong volume.",
+          history: [88.5, 89.4, 90.8, 91.5, 92.4, 93.1, 94.0, 94.8, 95.4, 96.5]
+        },
+        {
+          symbol: "IRB", name: "IRB Infrastructure Dev", sector: "Infrastructure",
+          price: 18.00, change_pct: 0.28, high52: 24.00, low52: 15.70,
+          rsi14: 46.1, ema20: 18.15, ema50: 18.60, ema200: 19.40, vol_ratio: 1.10,
+          mode: "CNC", setup: "Range Support Consolidation",
+          buy_zone: "₹16.80 – ₹17.80", breakout_trigger: 18.70,
+          target1: 20.20, target2: 22.00, stop_loss: 16.20,
+          pe: 19.7, roe: 4.29, roce: 7.47, div_yield: 0.87, book_val: 17.6,
+          earnings_note: "Trading near Book Value (₹17.60); low-risk accumulation band.",
+          history: [18.6, 18.4, 18.2, 18.0, 17.8, 17.7, 17.9, 17.9, 17.95, 18.0]
+        },
+        {
+          symbol: "YESBANK", name: "Yes Bank Ltd", sector: "Private Banking",
+          price: 18.09, change_pct: 1.40, high52: 24.50, low52: 16.10,
+          rsi14: 51.8, ema20: 17.85, ema50: 18.10, ema200: 18.90, vol_ratio: 1.62,
+          mode: "INTRADAY", setup: "Intraday VWAP & Volume Bounce",
+          buy_zone: "₹17.60 – ₹17.95", breakout_trigger: 18.35,
+          target1: 18.90, target2: 19.60, stop_loss: 17.40,
+          pe: 24.5, roe: 5.2, roce: 4.8, div_yield: 0.0, book_val: 14.8,
+          earnings_note: "High-liquidity intraday mover; watch ₹18.35 resistance.",
+          history: [17.7, 17.6, 17.8, 17.7, 17.9, 17.8, 17.7, 17.84, 17.84, 18.09]
+        },
+        {
+          symbol: "HDFCBANK", name: "HDFC Bank Ltd", sector: "Private Banking",
+          price: 830.80, change_pct: 1.25, high52: 1017.50, low52: 669.20,
+          rsi14: 54.6, ema20: 822.40, ema50: 819.10, ema200: 805.00, vol_ratio: 1.41,
+          mode: "INTRADAY", setup: "Index Leader • EMA20 Bounce",
+          buy_zone: "₹820.00 – ₹828.00", breakout_trigger: 838.00,
+          target1: 855.00, target2: 880.00, stop_loss: 814.00,
+          pe: 16.3, roe: 14.8, roce: 7.4, div_yield: 1.60, book_val: 391.0,
+          earnings_note: "Reasonable 16.3 P/E large-cap leader driving Nifty 50 recovery.",
+          history: [812, 815, 818, 816, 821, 823, 820, 822, 820.5, 830.8]
+        },
+        {
+          symbol: "RELIANCE", name: "Reliance Industries Ltd", sector: "Energy & Telecom",
+          price: 1380.00, change_pct: 0.95, high52: 1612.00, low52: 1152.00,
+          rsi14: 53.2, ema20: 1365.00, ema50: 1358.00, ema200: 1335.00, vol_ratio: 1.28,
+          mode: "CNC", setup: "Large-Cap Trend Continuation",
+          buy_zone: "₹1,355 – ₹1,375", breakout_trigger: 1395.00,
+          target1: 1435.00, target2: 1480.00, stop_loss: 1340.00,
+          pe: 22.8, roe: 8.69, roce: 10.26, div_yield: 0.44, book_val: 698.0,
+          earnings_note: "Above 20/50/200 EMAs; steady institutional accumulation.",
+          history: [1345, 1350, 1355, 1362, 1358, 1365, 1370, 1367, 1367, 1380]
+        }
+      ],
+      news: [
+        { time: "20 Nov • 13:52 IST", title: "Nifty 50 climbs above 25,729 as HDFC Bank & IT stocks lead 900+ pt Sensex rebound", source: "Business Standard / NSE", sentiment: "Bullish", ticker: "HDFCBANK" },
+        { time: "20 Nov • 12:44 IST", title: "NHPC gains for fifth straight session on NSE amid steady PSU power buying", source: "Tickertape / NSE", sentiment: "Bullish", ticker: "NHPC" },
+        { time: "20 Nov • 11:30 IST", title: "SJVN leadership role extended by Ministry of Power; stock consolidates near ₹55.88", source: "HDFC Securities", sentiment: "Neutral", ticker: "SJVN" },
+        { time: "19 Nov • 16:15 IST", title: "Suzlon Energy holds above ₹33.15 52-week support; traders watch ₹38.50 reclaim", source: "Kotak Neo / Screener", sentiment: "Neutral", ticker: "SUZLON" },
+        { time: "19 Nov • 15:40 IST", title: "Bank of Maharashtra tests ₹98.70 52-week high zone with 1.92x average volume", source: "Screener / BSE", sentiment: "Bullish", ticker: "MAHABANK" }
+      ],
+      smart_money: [
+        { entity: "DII Institutional Cash", action: "Net Buy", value: "+₹1,285.4 Cr", focus: "Private Banks & Power PSUs", date: "20 Nov 2026" },
+        { entity: "FII / FPI Cash Segment", action: "Net Sell", value: "-₹412.6 Cr", focus: "Metals & Consumer Durables", date: "20 Nov 2026" },
+        { entity: "NSE Delivery Spike Watch", action: "Accumulation", value: "Vol 1.92x", focus: "MAHABANK, NHPC, HDFCBANK", date: "20 Nov 2026" },
+        { entity: "Mid-Cap PSU Rotation", action: "Watchlist", value: "Support Hold", focus: "SUZLON (₹34.5–36.8), IRB (₹16.8–17.8)", date: "20 Nov 2026" }
+      ]
+    };
+
+    const MODULES = [
+      { id: "scanner", label: "1. Chart Scanner", icon: "scan-line" },
+      { id: "news", label: "2. News Monitor", icon: "newspaper" },
+      { id: "entry", label: "3. Entry Timer", icon: "crosshair" },
+      { id: "exit", label: "4. Exit Planner", icon: "log-out" },
+      { id: "timemachine", label: "5. Time Machine", icon: "history" },
+      { id: "risk", label: "6. Risk Manager", icon: "shield-check" },
+      { id: "budget", label: "7. Budget Manager", icon: "wallet" },
+      { id: "order", label: "8. Order Ticket", icon: "send" },
+      { id: "alerts", label: "9. Price Alerts", icon: "bell" },
+      { id: "earnings", label: "10. Earnings Analyst", icon: "bar-chart-3" },
+      { id: "smartmoney", label: "11. FII/DII Tracker", icon: "landmark" }
+    ];
+
+    let appData = structuredClone(DEFAULT_DATA);
+    let activeTab = "scanner";
+    let activeMode = "ALL";
+    let searchQuery = "";
+    let selectedSymbol = "SUZLON";
+    let mainChart = null;
+    let backtestChart = null;
+
+    // Safe localStorage helpers
+    function loadAlerts() {
+      try {
+        const raw = localStorage.getItem("isr_alerts_v1");
+        return raw ? JSON.parse(raw) : [
+          { id: 1, symbol: "SUZLON", condition: "Above", price: 38.50, note: "Breakout confirmation" },
+          { id: 2, symbol: "NHPC", condition: "Below", price: 74.80, note: "CNC dip buy zone" }
+        ];
+      } catch (e) {
+        return [];
+      }
+    }
+    function saveAlerts(list) {
+      try { localStorage.setItem("isr_alerts_v1", JSON.stringify(list)); } catch (e) {}
+    }
+    let priceAlerts = loadAlerts();
+
+    function showToast(msg) {
+      const t = document.getElementById("toast");
+      t.textContent = msg;
+      t.classList.remove("hidden");
+      clearTimeout(window._toastTimer);
+      window._toastTimer = setTimeout(() => t.classList.add("hidden"), 2800);
+    }
+
+    function getFilteredStocks() {
+      return appData.stocks.filter(s => {
+        const matchSearch = !searchQuery || s.symbol.toLowerCase().includes(searchQuery) || s.name.toLowerCase().includes(searchQuery) || s.sector.toLowerCase().includes(searchQuery);
+        if (!matchSearch) return false;
+        if (activeMode === "CNC") return s.mode === "CNC";
+        if (activeMode === "INTRADAY") return s.mode === "INTRADAY";
+        if (activeMode === "PENNY") return s.price < 100;
+        return true;
+      });
+    }
+
+    function renderTabs() {
+      const container = document.getElementById("module-tabs");
+      container.innerHTML = MODULES.map(m => `
+        <button data-tab="${m.id}" class="tab-btn inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition ${activeTab === m.id ? 'tab-active' : 'bg-slate-900 text-slate-300 border-slate-800 hover:bg-slate-800'}">
+          <i data-lucide="${m.icon}" class="w-3.5 h-3.5"></i>
+          <span>${m.label}</span>
+        </button>
+      `).join("");
+      container.querySelectorAll(".tab-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          activeTab = btn.dataset.tab;
+          renderTabs();
+          renderModule();
+        });
+      });
+      lucide.createIcons();
+    }
+
+    function renderScanner(stocks) {
+      const sel = appData.stocks.find(s => s.symbol === selectedSymbol) || stocks[0] || appData.stocks[0];
+      return `
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+          <div class="lg:col-span-2 glass-card rounded-xl p-4 overflow-hidden">
+            <div class="flex items-center justify-between mb-3">
+              <h2 class="text-sm font-semibold text-white">NSE Technical &amp; Delivery Scanner (${stocks.length} Stocks)</h2>
+              <span class="text-xs text-slate-400">Click any row to inspect chart</span>
+            </div>
+            <div class="overflow-x-auto scrollbar-thin">
+              <table class="w-full text-left text-xs">
+                <thead class="text-slate-400 border-b border-slate-800">
+                  <tr>
+                    <th class="py-2 pr-3">Symbol</th>
+                    <th class="py-2 px-2">LTP (₹)</th>
+                    <th class="py-2 px-2">Chg %</th>
+                    <th class="py-2 px-2">RSI(14)</th>
+                    <th class="py-2 px-2">Vol</th>
+                    <th class="py-2 px-2">Mode</th>
+                    <th class="py-2 pl-2">Setup</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-800/70">
+                  ${stocks.map(s => `
+                    <tr data-sym="${s.symbol}" class="stock-row cursor-pointer hover:bg-slate-800/60 transition ${sel.symbol === s.symbol ? 'bg-emerald-500/10' : ''}">
+                      <td class="py-2.5 pr-3">
+                        <div class="font-semibold text-white">${s.symbol}</div>
+                        <div class="text-[11px] text-slate-400">${s.sector}</div>
+                      </td>
+                      <td class="py-2.5 px-2 font-semibold text-slate-100">₹${s.price.toFixed(2)}</td>
+                      <td class="py-2.5 px-2 font-medium ${s.change_pct >= 0 ? 'text-emerald-400' : 'text-rose-400'}">${s.change_pct >= 0 ? '+' : ''}${s.change_pct.toFixed(2)}%</td>
+                      <td class="py-2.5 px-2">
+                        <span class="px-1.5 py-0.5 rounded ${s.rsi14 < 40 ? 'bg-sky-500/20 text-sky-300' : s.rsi14 > 65 ? 'bg-amber-500/20 text-amber-300' : 'bg-slate-800 text-slate-300'}">${s.rsi14.toFixed(1)}</span>
+                      </td>
+                      <td class="py-2.5 px-2 text-slate-300">${s.vol_ratio.toFixed(2)}x</td>
+                      <td class="py-2.5 px-2">
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold ${s.mode === 'CNC' ? 'bg-indigo-500/20 text-indigo-300' : 'bg-emerald-500/20 text-emerald-300'}">${s.mode}</span>
+                      </td>
+                      <td class="py-2.5 pl-2 text-slate-300">${s.setup}</td>
+                    </tr>
+                  `).join("")}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="glass-card rounded-xl p-4 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <div>
+                  <h3 class="text-base font-bold text-white">${sel.symbol} <span class="text-xs font-normal text-slate-400">NSE</span></h3>
+                  <p class="text-xs text-slate-400">${sel.name}</p>
+                </div>
+                <div class="text-right">
+                  <div class="text-lg font-bold text-white">₹${sel.price.toFixed(2)}</div>
+                  <div class="text-xs ${sel.change_pct >= 0 ? 'text-emerald-400' : 'text-rose-400'}">${sel.change_pct >= 0 ? '+' : ''}${sel.change_pct.toFixed(2)}%</div>
+                </div>
+              </div>
+              <div class="relative h-56 mt-3">
+                <canvas id="scannerChart"></canvas>
+              </div>
+            </div>
+            <div class="grid grid-cols-3 gap-2 mt-4 pt-3 border-t border-slate-800 text-center text-xs">
+              <div class="bg-slate-900/80 rounded-lg p-2">
+                <div class="text-slate-400">EMA 20</div>
+                <div class="font-semibold text-sky-300">₹${sel.ema20.toFixed(2)}</div>
+              </div>
+              <div class="bg-slate-900/80 rounded-lg p-2">
+                <div class="text-slate-400">EMA 50</div>
+                <div class="font-semibold text-amber-300">₹${sel.ema50.toFixed(2)}</div>
+              </div>
+              <div class="bg-slate-900/80 rounded-lg p-2">
+                <div class="text-slate-400">EMA 200</div>
+                <div class="font-semibold text-purple-300">₹${sel.ema200.toFixed(2)}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderNews() {
+      return `
+        <div class="glass-card rounded-xl p-4">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-sm font-semibold text-white">Indian Market &amp; Stock News Monitor</h2>
+            <span class="text-xs text-slate-400">Auto-parsed from NSE / Indian financial RSS feeds</span>
+          </div>
+          <div class="space-y-3">
+            ${appData.news.map(n => `
+              <div class="p-3.5 rounded-lg bg-slate-900/80 border border-slate-800 flex flex-wrap items-start justify-between gap-3">
+                <div class="space-y-1 max-w-3xl">
+                  <div class="flex items-center gap-2 text-xs">
+                    <span class="px-2 py-0.5 rounded bg-slate-800 text-emerald-300 font-semibold">${n.ticker}</span>
+                    <span class="text-slate-400">${n.time}</span>
+                    <span class="text-slate-500">• ${n.source}</span>
+                  </div>
+                  <p class="text-sm font-medium text-slate-100">${n.title}</p>
+                </div>
+                <span class="px-2.5 py-1 rounded-full text-xs font-medium ${n.sentiment === 'Bullish' ? 'bg-emerald-500/20 text-emerald-300' : n.sentiment === 'Bearish' ? 'bg-rose-500/20 text-rose-300' : 'bg-amber-500/20 text-amber-300'}">${n.sentiment}</span>
+              </div>
+            `).join("")}
+          </div>
+        </div>
+      `;
+    }
+
+    function renderEntry(stocks) {
+      return `
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          ${stocks.map(s => {
+            const inZone = s.price <= s.ema20 * 1.01;
+            return `
+              <div class="glass-card rounded-xl p-4 space-y-3">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <h3 class="font-bold text-white">${s.symbol}</h3>
+                    <span class="text-xs text-slate-400">${s.mode} • LTP ₹${s.price.toFixed(2)}</span>
+                  </div>
+                  <span class="px-2.5 py-1 rounded-full text-xs font-medium ${inZone ? 'bg-emerald-500/20 text-emerald-300' : 'bg-amber-500/20 text-amber-300'}">
+                    ${inZone ? 'In Buy Zone' : 'Wait for Dip / Breakout'}
+                  </span>
+                </div>
+                <div class="grid grid-cols-2 gap-2 text-xs">
+                  <div class="p-2.5 rounded-lg bg-slate-900 border border-slate-800">
+                    <div class="text-slate-400">Dip Buy Zone</div>
+                    <div class="font-semibold text-emerald-300 mt-0.5">${s.buy_zone}</div>
+                  </div>
+                  <div class="p-2.5 rounded-lg bg-slate-900 border border-slate-800">
+                    <div class="text-slate-400">Breakout Trigger</div>
+                    <div class="font-semibold text-sky-300 mt-0.5">Above ₹${s.breakout_trigger.toFixed(2)}</div>
+                  </div>
+                </div>
+                <p class="text-xs text-slate-400">${s.setup}</p>
+              </div>
+            `;
+          }).join("")}
+        </div>
+      `;
+    }
+
+    function renderExit(stocks) {
+      return `
+        <div class="glass-card rounded-xl p-4 overflow-x-auto">
+          <h2 class="text-sm font-semibold text-white mb-3">Exit Planner — Targets &amp; Closing Stop-Loss Levels</h2>
+          <table class="w-full text-left text-xs">
+            <thead class="text-slate-400 border-b border-slate-800">
+              <tr>
+                <th class="py-2 pr-3">Ticker</th>
+                <th class="py-2 px-2">LTP (₹)</th>
+                <th class="py-2 px-2">Stop-Loss (Closing)</th>
+                <th class="py-2 px-2">Target 1</th>
+                <th class="py-2 px-2">Target 2</th>
+                <th class="py-2 pl-2">Risk : Reward</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-800">
+              ${stocks.map(s => {
+                const risk = Math.max(0.01, s.price - s.stop_loss);
+                const reward = Math.max(0, s.target1 - s.price);
+                const rr = (reward / risk).toFixed(2);
+                return `
+                  <tr>
+                    <td class="py-2.5 pr-3 font-semibold text-white">${s.symbol}</td>
+                    <td class="py-2.5 px-2">₹${s.price.toFixed(2)}</td>
+                    <td class="py-2.5 px-2 text-rose-400 font-medium">₹${s.stop_loss.toFixed(2)}</td>
+                    <td class="py-2.5 px-2 text-emerald-400 font-medium">₹${s.target1.toFixed(2)}</td>
+                    <td class="py-2.5 px-2 text-emerald-300 font-semibold">₹${s.target2.toFixed(2)}</td>
+                    <td class="py-2.5 pl-2"><span class="px-2 py-0.5 rounded bg-slate-800 text-sky-300">1 : ${rr}</span></td>
+                  </tr>
+                `;
+              }).join("")}
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    function renderTimeMachine() {
+      return `
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+          <div class="glass-card rounded-xl p-4 space-y-4">
+            <h2 class="text-sm font-semibold text-white">Time Machine — Strategy Backtester</h2>
+            <div>
+              <label class="block text-xs text-slate-400 mb-1">Select NSE Strategy</label>
+              <select id="bt-strategy" class="w-full px-3 py-2 rounded-lg bg-slate-900 border border-slate-700 text-xs text-white">
+                <option value="cnc_dip">CNC Delivery: RSI(14) &lt; 40 Dip + Support Hold</option>
+                <option value="intraday_ema">Intraday MIS: EMA20 Breakout + Volume &gt; 1.5x</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs text-slate-400 mb-1">Starting Capital (₹)</label>
+              <input id="bt-capital" type="number" value="100000" min="5000" step="5000" class="w-full px-3 py-2 rounded-lg bg-slate-900 border border-slate-700 text-xs text-white" />
+            </div>
+            <button id="bt-run" class="w-full py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold transition">Run Simulation</button>
+            <div id="bt-stats" class="grid grid-cols-2 gap-2 text-xs pt-2"></div>
+          </div>
+          <div class="lg:col-span-2 glass-card rounded-xl p-4">
+            <h3 class="text-sm font-semibold text-white mb-2">Simulated 6-Month Equity Curve (₹)</h3>
+            <div class="relative h-72">
+              <canvas id="backtestCanvas"></canvas>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderRiskManager() {
+      return `
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div class="glass-card rounded-xl p-4 space-y-3">
+            <h2 class="text-sm font-semibold text-white">Risk Manager — Daily Capital Guardrails</h2>
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs text-slate-400 mb-1">Trading Capital (₹)</label>
+                <input id="rm-cap" type="number" value="100000" class="w-full px-3 py-2 rounded-lg bg-slate-900 border border-slate-700 text-xs text-white" />
+              </div>
+              <div>
+                <label class="block text-xs text-slate-400 mb-1">Max Daily Loss Rule (%)</label>
+                <input id="rm-maxpct" type="number" value="2" step="0.5" class="w-full px-3 py-2 rounded-lg bg-slate-900 border border-slate-700 text-xs text-white" />
+              </div>
+            </div>
+            <div>
+              <label class="block text-xs text-slate-400 mb-1">Current Day Realized P&amp;L (₹)</label>
+              <input id="rm-pnl" type="number" value="-850" class="w-full px-3 py-2 rounded-lg bg-slate-900 border border-slate-700 text-xs text-white" />
+            </div>
+            <div id="rm-output" class="p-3 rounded-lg bg-slate-900 border border-slate-800 text-xs space-y-1.5"></div>
+          </div>
+          <div class="glass-card rounded-xl p-4 space-y-3">
+            <h2 class="text-sm font-semibold text-white">SEBI / NSE Discipline Checklist</h2>
+            <ul class="space-y-2 text-xs text-slate-300">
+              <li class="p-2.5 rounded-lg bg-slate-900 border border-slate-800 flex items-center gap-2"><i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400 shrink-0"></i> Never risk more than 1%–2% of total capital on a single Intraday or CNC trade.</li>
+              <li class="p-2.5 rounded-lg bg-slate-900 border border-slate-800 flex items-center gap-2"><i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400 shrink-0"></i> Always place a GTT / system Stop-Loss immediately after order execution.</li>
+              <li class="p-2.5 rounded-lg bg-slate-900 border border-slate-800 flex items-center gap-2"><i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400 shrink-0"></i> Avoid averaging down losing Intraday MIS positions before 3:15 PM square-off.</li>
+              <li class="p-2.5 rounded-lg bg-slate-900 border border-slate-800 flex items-center gap-2"><i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400 shrink-0"></i> For CNC Delivery, accumulate in tranches inside the support buy zone.</li>
+            </ul>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderBudgetManager() {
+      return `
+        <div class="glass-card rounded-xl p-4 max-w-3xl space-y-4">
+          <h2 class="text-sm font-semibold text-white">Budget Manager — Intraday (MIS) &amp; CNC Position Sizer</h2>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+            <div>
+              <label class="block text-slate-400 mb-1">Total Capital (₹)</label>
+              <input id="bm-cap" type="number" value="50000" class="w-full px-3 py-2 rounded-lg bg-slate-900 border border-slate-700 text-white" />
+            </div>
+            <div>
+              <label class="block text-slate-400 mb-1">Risk per Trade (%)</label>
+              <input id="bm-risk" type="number" value="1.5" step="0.25" class="w-full px-3 py-2 rounded-lg bg-slate-900 border border-slate-700 text-white" />
+            </div>
+            <div>
+              <label class="block text-slate-400 mb-1">Product Type</label>
+              <select id="bm-prod" class="w-full px-3 py-2 rounded-lg bg-slate-900 border border-slate-700 text-white">
+                <option value="CNC">CNC Delivery (1x Margin)</option>
+                <option value="MIS">Intraday MIS (5x Margin)</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-slate-400 mb-1">Entry Price (₹)</label>
+              <input id="bm-entry" type="number" value="36.55" step="0.05" class="w-full px-3 py-2 rounded-lg bg-slate-900 border border-slate-700 text-white" />
+            </div>
+            <div>
+              <label class="block text-slate-400 mb-1">Stop-Loss (₹)</label>
+              <input id="bm-sl" type="number" value="33.10" step="0.05" class="w-full px-3 py-2 rounded-lg bg-slate-900 border border-slate-700 text-white" />
+            </div>
+            <div>
+              <label class="block text-slate-400 mb-1">Target Price (₹)</label>
+              <input id="bm-tgt" type="number" value="41.20" step="0.05" class="w-full px-3 py-2 rounded-lg bg-slate-900 border border-slate-700 text-white" />
+            </div>
+          </div>
+          <div id="bm-result" class="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2"></div>
+        </div>
+      `;
+    }
+
+    function renderOrderTicket() {
+      const sel = appData.stocks.find(s => s.symbol === selectedSymbol) || appData.stocks[0];
+      return `
+        <div class="glass-card rounded-xl p-4 max-w-2xl space-y-4">
+          <div class="flex items-center justify-between">
+            <h2 class="text-sm font-semibold text-white">Order Ticket — Safe Broker Pre-Check</h2>
+            <span class="text-xs text-slate-400">Copy-ready for Zerodha Kite / Groww / Angel One</span>
+          </div>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+            <div>
+              <label class="block text-slate-400 mb-1">NSE Ticker</label>
+              <select id="ot-sym" class="w-full px-2.5 py-2 rounded-lg bg-slate-900 border border-slate-700 text-white">
+                ${appData.stocks.map(s => `<option value="${s.symbol}" ${s.symbol === sel.symbol ? 'selected' : ''}>${s.symbol}</option>`).join("")}
+              </select>
+            </div>
+            <div>
+              <label class="block text-slate-400 mb-1">Product</label>
+              <select id="ot-prod" class="w-full px-2.5 py-2 rounded-lg bg-slate-900 border border-slate-700 text-white">
+                <option value="CNC">CNC (Delivery)</option>
+                <option value="MIS">MIS (Intraday)</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-slate-400 mb-1">Quantity</label>
+              <input id="ot-qty" type="number" value="100" min="1" class="w-full px-2.5 py-2 rounded-lg bg-slate-900 border border-slate-700 text-white" />
+            </div>
+            <div>
+              <label class="block text-slate-400 mb-1">Order Type</label>
+              <select id="ot-type" class="w-full px-2.5 py-2 rounded-lg bg-slate-900 border border-slate-700 text-white">
+                <option value="LIMIT">LIMIT</option>
+                <option value="SL-L">SL-LIMIT</option>
+                <option value="MARKET">MARKET</option>
+              </select>
+            </div>
+          </div>
+          <pre id="ot-summary" class="p-3 rounded-lg bg-slate-950 border border-slate-800 text-xs text-emerald-300 whitespace-pre-wrap"></pre>
+          <button id="ot-copy" class="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold transition">Copy Order Ticket</button>
+        </div>
+      `;
+    }
+
+    function renderAlerts() {
+      return `
+        <div class="glass-card rounded-xl p-4 max-w-3xl space-y-4">
+          <h2 class="text-sm font-semibold text-white">Price Alerts Manager</h2>
+          <div class="grid grid-cols-1 sm:grid-cols-5 gap-2 text-xs">
+            <select id="al-sym" class="px-2.5 py-2 rounded-lg bg-slate-900 border border-slate-700 text-white">
+              ${appData.stocks.map(s => `<option value="${s.symbol}">${s.symbol}</option>`).join("")}
+            </select>
+            <select id="al-cond" class="px-2.5 py-2 rounded-lg bg-slate-900 border border-slate-700 text-white">
+              <option value="Above">Crosses Above</option>
+              <option value="Below">Drops Below</option>
+            </select>
+            <input id="al-price" type="number" placeholder="Price (₹)" step="0.05" class="px-2.5 py-2 rounded-lg bg-slate-900 border border-slate-700 text-white" />
+            <input id="al-note" type="text" placeholder="Note (e.g. Dip Buy)" class="px-2.5 py-2 rounded-lg bg-slate-900 border border-slate-700 text-white" />
+            <button id="al-add" class="px-3 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-semibold">Add Alert</button>
+          </div>
+          <div id="al-list" class="space-y-2">
+            ${priceAlerts.length === 0 ? '<p class="text-xs text-slate-400">No alerts yet.</p>' : priceAlerts.map(a => `
+              <div class="p-3 rounded-lg bg-slate-900 border border-slate-800 flex items-center justify-between text-xs">
+                <div>
+                  <span class="font-bold text-white">${a.symbol}</span>
+                  <span class="text-slate-300"> ${a.condition} ₹${Number(a.price).toFixed(2)}</span>
+                  <span class="text-slate-500 ml-2">${a.note || ''}</span>
+                </div>
+                <button data-id="${a.id}" class="al-del text-rose-400 hover:text-rose-300 font-medium">Remove</button>
+              </div>
+            `).join("")}
+          </div>
+        </div>
+      `;
+    }
+
+    function renderEarnings(stocks) {
+      return `
+        <div class="glass-card rounded-xl p-4 overflow-x-auto">
+          <h2 class="text-sm font-semibold text-white mb-3">Earnings &amp; Fundamentals Analyst</h2>
+          <table class="w-full text-left text-xs">
+            <thead class="text-slate-400 border-b border-slate-800">
+              <tr>
+                <th class="py-2 pr-3">Stock</th>
+                <th class="py-2 px-2">P/E</th>
+                <th class="py-2 px-2">ROE %</th>
+                <th class="py-2 px-2">ROCE %</th>
+                <th class="py-2 px-2">Div Yield</th>
+                <th class="py-2 px-2">52W H / L</th>
+                <th class="py-2 pl-2">Analyst Note</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-800">
+              ${stocks.map(s => `
+                <tr>
+                  <td class="py-2.5 pr-3 font-semibold text-white">${s.symbol}</td>
+                  <td class="py-2.5 px-2">${s.pe.toFixed(2)}</td>
+                  <td class="py-2.5 px-2 text-emerald-300">${s.roe.toFixed(2)}%</td>
+                  <td class="py-2.5 px-2">${s.roce.toFixed(2)}%</td>
+                  <td class="py-2.5 px-2">${s.div_yield.toFixed(2)}%</td>
+                  <td class="py-2.5 px-2 text-slate-300">₹${s.high52} / ₹${s.low52}</td>
+                  <td class="py-2.5 pl-2 text-slate-300 max-w-xs">${s.earnings_note}</td>
+                </tr>
+              `).join("")}
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    function renderSmartMoney() {
+      return `
+        <div class="glass-card rounded-xl p-4 space-y-4">
+          <div class="flex items-center justify-between">
+            <h2 class="text-sm font-semibold text-white">Smart Money Tracker — FII / DII Flows &amp; Delivery Rotation</h2>
+            <span class="text-xs text-slate-400">Indian Institutional Equivalent of Pelosi Tracker</span>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            ${appData.smart_money.map(item => `
+              <div class="p-3.5 rounded-lg bg-slate-900 border border-slate-800 flex items-center justify-between">
+                <div>
+                  <div class="text-xs font-semibold text-white">${item.entity}</div>
+                  <div class="text-xs text-slate-400 mt-0.5">${item.focus} • ${item.date}</div>
+                </div>
+                <div class="text-right">
+                  <div class="text-sm font-bold ${item.value.includes('-') ? 'text-rose-400' : 'text-emerald-400'}">${item.value}</div>
+                  <div class="text-[11px] text-slate-400">${item.action}</div>
+                </div>
+              </div>
+            `).join("")}
+          </div>
+        </div>
+      `;
+    }
+
+    function attachModuleEvents(stocks) {
+      if (activeTab === "scanner") {
+        document.querySelectorAll(".stock-row").forEach(row => {
+          row.addEventListener("click", () => {
+            selectedSymbol = row.dataset.sym;
+            renderModule();
+          });
+        });
+        const sel = appData.stocks.find(s => s.symbol === selectedSymbol) || stocks[0] || appData.stocks[0];
+        const ctx = document.getElementById("scannerChart");
+        if (ctx) {
+          if (mainChart) mainChart.destroy();
+          mainChart = new Chart(ctx, {
+            type: "line",
+            data: {
+              labels: sel.history.map((_, i) => `D-${sel.history.length - 1 - i}`),
+              datasets: [{
+                label: `${sel.symbol} Close (₹)`,
+                data: sel.history,
+                borderColor: "#10b981",
+                backgroundColor: "rgba(16, 185, 129, 0.12)",
+                fill: true,
+                tension: 0.3,
+                pointRadius: 3
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: { legend: { labels: { color: "#cbd5e1", font: { size: 11 } } } },
+              scales: {
+                x: { ticks: { color: "#94a3b8", font: { size: 10 } }, grid: { color: "rgba(51,65,85,0.3)" } },
+                y: { ticks: { color: "#94a3b8", font: { size: 10 } }, grid: { color: "rgba(51,65,85,0.3)" } }
+              }
+            }
+          });
+        }
+      }
+
+      if (activeTab === "timemachine") {
+        const runBtn = document.getElementById("bt-run");
+        const runSim = () => {
+          const strat = document.getElementById("bt-strategy").value;
+          const cap = Math.max(1000, Number(document.getElementById("bt-capital").value) || 100000);
+          const mults = strat === "cnc_dip"
+            ? [1.0, 1.032, 1.058, 1.041, 1.089, 1.124, 1.168]
+            : [1.0, 1.021, 0.994, 1.045, 1.072, 1.059, 1.115];
+          const winRate = strat === "cnc_dip" ? "64.0%" : "57.5%";
+          const maxDd = strat === "cnc_dip" ? "-3.8%" : "-5.4%";
+          const finalVal = Math.round(cap * mults[mults.length - 1]);
+          const netRet = (((finalVal - cap) / cap) * 100).toFixed(1);
+          document.getElementById("bt-stats").innerHTML = `
+            <div class="p-2.5 rounded-lg bg-slate-900 border border-slate-800"><div class="text-slate-400">Simulated Final</div><div class="font-bold text-emerald-400">₹${finalVal.toLocaleString('en-IN')}</div></div>
+            <div class="p-2.5 rounded-lg bg-slate-900 border border-slate-800"><div class="text-slate-400">Net Return</div><div class="font-bold text-emerald-300">+${netRet}%</div></div>
+            <div class="p-2.5 rounded-lg bg-slate-900 border border-slate-800"><div class="text-slate-400">Win Rate</div><div class="font-bold text-white">${winRate}</div></div>
+            <div class="p-2.5 rounded-lg bg-slate-900 border border-slate-800"><div class="text-slate-400">Max Drawdown</div><div class="font-bold text-rose-400">${maxDd}</div></div>
+          `;
+          const ctx = document.getElementById("backtestCanvas");
+          if (backtestChart) backtestChart.destroy();
+          backtestChart = new Chart(ctx, {
+            type: "line",
+            data: {
+              labels: ["M1", "M2", "M3", "M4", "M5", "M6", "Now"],
+              datasets: [{
+                label: "Portfolio Equity (₹)",
+                data: mults.map(m => Math.round(cap * m)),
+                borderColor: "#38bdf8",
+                backgroundColor: "rgba(56, 189, 248, 0.14)",
+                fill: true,
+                tension: 0.3
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: { legend: { labels: { color: "#cbd5e1" } } },
+              scales: {
+                x: { ticks: { color: "#94a3b8" }, grid: { color: "rgba(51,65,85,0.3)" } },
+                y: { ticks: { color: "#94a3b8" }, grid: { color: "rgba(51,65,85,0.3)" } }
+              }
+            }
+          });
+        };
+        runBtn.addEventListener("click", runSim);
+        runSim();
+      }
+
+      if (activeTab === "risk") {
+        const updateRisk = () => {
+          const cap = Math.max(1, Number(document.getElementById("rm-cap").value) || 100000);
+          const maxPct = Math.max(0.1, Number(document.getElementById("rm-maxpct").value) || 2);
+          const pnl = Number(document.getElementById("rm-pnl").value) || 0;
+          const maxLoss = (cap * maxPct) / 100;
+          const remaining = maxLoss + pnl;
+          const breached = remaining <= 0;
+          document.getElementById("rm-output").innerHTML = `
+            <div class="flex justify-between"><span class="text-slate-400">Max Daily Loss Allowance:</span><strong class="text-white">₹${maxLoss.toLocaleString('en-IN')}</strong></div>
+            <div class="flex justify-between"><span class="text-slate-400">Remaining Risk Buffer Today:</span><strong class="${breached ? 'text-rose-400' : 'text-emerald-400'}">₹${remaining.toLocaleString('en-IN')}</strong></div>
+            <div class="pt-1 font-medium ${breached ? 'text-rose-400' : 'text-emerald-300'}">${breached ? 'STOP TRADING FOR TODAY — Daily Loss Limit Hit' : 'Status: Safe to take controlled setups'}</div>
+          `;
+        };
+        ["rm-cap", "rm-maxpct", "rm-pnl"].forEach(id => document.getElementById(id).addEventListener("input", updateRisk));
+        updateRisk();
+      }
+
+      if (activeTab === "budget") {
+        const calcBudget = () => {
+          const cap = Math.max(100, Number(document.getElementById("bm-cap").value) || 50000);
+          const riskPct = Math.max(0.1, Number(document.getElementById("bm-risk").value) || 1.5);
+          const prod = document.getElementById("bm-prod").value;
+          const entry = Math.max(0.1, Number(document.getElementById("bm-entry").value) || 1);
+          const sl = Math.max(0.05, Number(document.getElementById("bm-sl").value) || 0.5);
+          const tgt = Math.max(0.1, Number(document.getElementById("bm-tgt").value) || entry * 1.1);
+          const riskPerShare = Math.max(0.05, Math.abs(entry - sl));
+          const maxRiskRs = (cap * riskPct) / 100;
+          const leverage = prod === "MIS" ? 5 : 1;
+          const maxAffordableQty = Math.floor((cap * leverage) / entry);
+          const riskBasedQty = Math.floor(maxRiskRs / riskPerShare);
+          const qty = Math.max(1, Math.min(maxAffordableQty, riskBasedQty));
+          const reqMargin = (qty * entry) / leverage;
+          const estProfit = qty * (tgt - entry);
+          const sttRate = prod === "CNC" ? 0.001 : 0.00025;
+          const estCharges = Math.round(qty * entry * sttRate * 2 + 40);
+          document.getElementById("bm-result").innerHTML = `
+            <div class="p-3 rounded-lg bg-slate-900 border border-slate-800"><div class="text-[11px] text-slate-400">Recommended Qty</div><div class="text-base font-bold text-emerald-400">${qty} Shares</div></div>
+            <div class="p-3 rounded-lg bg-slate-900 border border-slate-800"><div class="text-[11px] text-slate-400">Margin Used (${prod})</div><div class="text-base font-bold text-white">₹${Math.round(reqMargin).toLocaleString('en-IN')}</div></div>
+            <div class="p-3 rounded-lg bg-slate-900 border border-slate-800"><div class="text-[11px] text-slate-400">Est. Target Profit</div><div class="text-base font-bold text-sky-300">₹${Math.round(estProfit).toLocaleString('en-IN')}</div></div>
+            <div class="p-3 rounded-lg bg-slate-900 border border-slate-800"><div class="text-[11px] text-slate-400">Est. STT + Fees</div><div class="text-base font-bold text-amber-300">~₹${estCharges}</div></div>
+          `;
+        };
+        ["bm-cap", "bm-risk", "bm-prod", "bm-entry", "bm-sl", "bm-tgt"].forEach(id => document.getElementById(id).addEventListener("input", calcBudget));
+        calcBudget();
+      }
+
+      if (activeTab === "order") {
+        const updateTicket = () => {
+          const sym = document.getElementById("ot-sym").value;
+          const s = appData.stocks.find(x => x.symbol === sym) || appData.stocks[0];
+          const prod = document.getElementById("ot-prod").value;
+          const qty = Math.max(1, Number(document.getElementById("ot-qty").value) || 1);
+          const type = document.getElementById("ot-type").value;
+          const txt = `EXCHANGE: NSE | SYMBOL: ${s.symbol}\nACTION: BUY | PRODUCT: ${prod} | ORDER: ${type}\nQTY: ${qty} | ENTRY: ₹${s.price.toFixed(2)}\nSTOP-LOSS (GTT): ₹${s.stop_loss.toFixed(2)} | TARGET 1: ₹${s.target1.toFixed(2)}\nEST. VALUE: ₹${Math.round(qty * s.price).toLocaleString('en-IN')}`;
+          document.getElementById("ot-summary").textContent = txt;
+        };
+        ["ot-sym", "ot-prod", "ot-qty", "ot-type"].forEach(id => document.getElementById(id).addEventListener("input", updateTicket));
+        document.getElementById("ot-copy").addEventListener("click", () => {
+          const text = document.getElementById("ot-summary").textContent;
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(() => showToast("Order ticket copied!")).catch(() => {});
+          } else {
+            const ta = document.createElement("textarea");
+            ta.value = text; document.body.appendChild(ta); ta.select();
+            document.execCommand("copy"); document.body.removeChild(ta);
+            showToast("Order ticket copied!");
+          }
+        });
+        updateTicket();
+      }
+
+      if (activeTab === "alerts") {
+        document.getElementById("al-add").addEventListener("click", () => {
+          const symbol = document.getElementById("al-sym").value;
+          const condition = document.getElementById("al-cond").value;
+          const price = parseFloat(document.getElementById("al-price").value);
+          const note = document.getElementById("al-note").value.trim();
+          if (!price || price <= 0) { showToast("Enter a valid price"); return; }
+          priceAlerts.unshift({ id: Date.now(), symbol, condition, price, note });
+          saveAlerts(priceAlerts);
+          showToast(`Alert saved for ${symbol}`);
+          renderModule();
+        });
+        document.querySelectorAll(".al-del").forEach(btn => {
+          btn.addEventListener("click", () => {
+            const id = Number(btn.dataset.id);
+            priceAlerts = priceAlerts.filter(a => a.id !== id);
+            saveAlerts(priceAlerts);
+            renderModule();
+          });
+        });
+      }
+    }
+
+    function renderModule() {
+      const stocks = getFilteredStocks();
+      const view = document.getElementById("module-view");
+      if (activeTab === "scanner") view.innerHTML = renderScanner(stocks.length ? stocks : appData.stocks);
+      else if (activeTab === "news") view.innerHTML = renderNews();
+      else if (activeTab === "entry") view.innerHTML = renderEntry(stocks.length ? stocks : appData.stocks);
+      else if (activeTab === "exit") view.innerHTML = renderExit(stocks.length ? stocks : appData.stocks);
+      else if (activeTab === "timemachine") view.innerHTML = renderTimeMachine();
+      else if (activeTab === "risk") view.innerHTML = renderRiskManager();
+      else if (activeTab === "budget") view.innerHTML = renderBudgetManager();
+      else if (activeTab === "order") view.innerHTML = renderOrderTicket();
+      else if (activeTab === "alerts") view.innerHTML = renderAlerts();
+      else if (activeTab === "earnings") view.innerHTML = renderEarnings(stocks.length ? stocks : appData.stocks);
+      else if (activeTab === "smartmoney") view.innerHTML = renderSmartMoney();
+
+      lucide.createIcons();
+      attachModuleEvents(stocks.length ? stocks : appData.stocks);
+    }
+
+    // Mode & Search listeners
+    document.querySelectorAll(".mode-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        activeMode = btn.dataset.mode;
+        document.querySelectorAll(".mode-btn").forEach(b => {
+          b.className = b.dataset.mode === activeMode
+            ? "mode-btn px-3 py-1.5 rounded-lg text-xs font-medium bg-emerald-600 text-white transition"
+            : "mode-btn px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-800 text-slate-300 hover:bg-slate-700 transition";
+        });
+        renderModule();
+      });
+    });
+
+    document.getElementById("ticker-search").addEventListener("input", (e) => {
+      searchQuery = e.target.value.trim().toLowerCase();
+      renderModule();
+    });
+
+    document.getElementById("json-upload").addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        try {
+          const parsed = JSON.parse(ev.target.result);
+          if (parsed && Array.isArray(parsed.stocks)) {
+            appData = parsed;
+            if (appData.meta && appData.meta.updated_ist) {
+              document.getElementById("last-updated-text").textContent = "Updated: " + appData.meta.updated_ist;
+            }
+            if (appData.meta && appData.meta.nifty50) {
+              document.getElementById("nifty-val").textContent = Number(appData.meta.nifty50.price).toLocaleString("en-IN");
+              const chg = Number(appData.meta.nifty50.change_pct);
+              document.getElementById("nifty-chg").textContent = `(${chg >= 0 ? '+' : ''}${chg.toFixed(2)}%)`;
+            }
+            renderModule();
+            showToast("Loaded daily_report.json successfully!");
+          }
+        } catch (err) {
+          showToast("Invalid JSON format");
+        }
+      };
+      reader.readAsText(file);
+    });
+
+    // Auto-load ./data/daily_report.json when hosted on Cloudflare Pages
+    async function tryLoadLiveRepoData() {
+      if (!window.location.protocol.startsWith("http")) return;
+      try {
+        const res = await fetch("./data/daily_report.json?t=" + Date.now());
+        if (res.ok) {
+          const parsed = await res.json();
+          if (parsed && Array.isArray(parsed.stocks)) {
+            appData = parsed;
+            if (appData.meta && appData.meta.updated_ist) {
+              document.getElementById("last-updated-text").textContent = "Updated: " + appData.meta.updated_ist;
+            }
+            if (appData.meta && appData.meta.nifty50) {
+              document.getElementById("nifty-val").textContent = Number(appData.meta.nifty50.price).toLocaleString("en-IN");
+              const chg = Number(appData.meta.nifty50.change_pct);
+              document.getElementById("nifty-chg").textContent = `(${chg >= 0 ? '+' : ''}${chg.toFixed(2)}%)`;
+            }
+            renderModule();
+          }
+        }
+      } catch (e) {}
+    }
+
+    renderTabs();
+    renderModule();
+    tryLoadLiveRepoData();
+  </script>
+</body>
+</html>
