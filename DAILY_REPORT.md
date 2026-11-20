@@ -1,4 +1,4 @@
-# Daily NSE Report (20 Nov 2026 • 16:44 IST)
+# Daily NSE Report (20 Nov 2026 • 16:49 IST)
 **NIFTY 50:** 25800.6 (1.12%)
 
 ## Watchlist Setups
