@@ -1,108 +1,108 @@
-# Daily NSE Report (27 Nov 2026 • 09:40 IST)
-**NIFTY 50:** 25862.55 (-0.08%)
+# Daily NSE Report (27 Nov 2026 • 16:36 IST)
+**NIFTY 50:** 25607.2 (-1.07%)
 
 ## Watchlist Setups
 | Symbol | LTP (₹) | Chg % | Mode | Buy Zone | Target 1 | Stop-Loss | Setup |
 | :--- | ---: | ---: | :---: | :--- | ---: | ---: | :--- |
-| **SUZLON** | ₹36.95 | 1.82% | CNC | ₹35.84 – ₹37.48 | ₹39.17 | ₹34.73 | Oversold Dip Accumulation Zone |
-| **NHPC** | ₹76.23 | 0.43% | CNC | ₹73.8 – ₹76.61 | ₹80.8 | ₹71.66 | Oversold Dip Accumulation Zone |
-| **SJVN** | ₹55.52 | 0.87% | CNC | ₹53.85 – ₹55.97 | ₹58.85 | ₹52.19 | Oversold Dip Accumulation Zone |
-| **MAHABANK** | ₹95.75 | 1.65% | INTRADAY | ₹88.82 – ₹96.23 | ₹101.5 | ₹88.65 | Bullish Trend Continuation |
-| **IRB** | ₹17.53 | 1.1% | CNC | ₹17.0 – ₹17.64 | ₹19.17 | ₹16.48 | Consolidation • Watch EMA20 |
-| **YESBANK** | ₹17.81 | 0.74% | INTRADAY | ₹17.03 – ₹17.9 | ₹18.88 | ₹16.74 | Consolidation • Watch EMA20 |
-| **HDFCBANK** | ₹860.85 | -0.13% | INTRADAY | ₹776.69 – ₹865.15 | ₹912.5 | ₹786.03 | Bullish Trend Continuation |
-| **RELIANCE** | ₹1388.9 | -0.52% | CNC | ₹1291.96 – ₹1395.84 | ₹1472.23 | ₹1304.14 | Bullish Trend Continuation |
-| **JPPOWER** | ₹13.21 | 1.15% | CNC | ₹12.81 – ₹13.65 | ₹14.2 | ₹12.42 | Oversold Dip Accumulation Zone |
-| **CUPID** | ₹377.2 | 1.64% | CNC | ₹346.15 – ₹379.09 | ₹399.83 | ₹346.57 | Bullish Trend Continuation |
+| **SUZLON** | ₹36.38 | 0.25% | CNC | ₹35.29 – ₹37.42 | ₹38.9 | ₹34.2 | Oversold Dip Accumulation Zone |
+| **NHPC** | ₹75.65 | -0.33% | CNC | ₹73.38 – ₹76.4 | ₹80.19 | ₹71.11 | Oversold Dip Accumulation Zone |
+| **SJVN** | ₹55.05 | 0.02% | CNC | ₹53.4 – ₹55.93 | ₹58.8 | ₹51.75 | Oversold Dip Accumulation Zone |
+| **MAHABANK** | ₹95.73 | 1.62% | INTRADAY | ₹88.82 – ₹96.21 | ₹101.47 | ₹88.65 | Bullish Trend Continuation |
+| **IRB** | ₹17.3 | -0.06% | CNC | ₹16.78 – ₹17.6 | ₹19.09 | ₹16.26 | Consolidation • Watch EMA20 |
+| **YESBANK** | ₹17.8 | 0.68% | INTRADAY | ₹17.03 – ₹17.89 | ₹18.87 | ₹16.73 | Consolidation • Watch EMA20 |
+| **HDFCBANK** | ₹857.25 | -0.55% | INTRADAY | ₹776.35 – ₹861.54 | ₹908.69 | ₹786.03 | Bullish Trend Continuation |
+| **RELIANCE** | ₹1382.6 | -0.97% | CNC | ₹1291.38 – ₹1389.51 | ₹1465.56 | ₹1299.64 | Bullish Trend Continuation |
+| **JPPOWER** | ₹13.14 | 0.61% | CNC | ₹12.75 – ₹13.64 | ₹14.2 | ₹12.35 | Oversold Dip Accumulation Zone |
+| **CUPID** | ₹389.5 | 4.96% | CNC | ₹347.28 – ₹391.45 | ₹412.87 | ₹346.57 | Volume Breakout • Above EMA20 |
 
 ## Top Picks by Price Range (Up to ₹1,000)
 ### Below ₹100
 | # | Symbol | LTP (₹) | Buy Zone | Target 1 | Stop-Loss | Setup |
 | :---: | :--- | ---: | :--- | ---: | ---: | :--- |
-| 1 | **AHCL** | ₹24.74 | ₹24.0 – ₹25.78 | ₹27.73 | ₹23.26 | Oversold Dip Accumulation Zone |
-| 2 | **SONAMLTD** | ₹68.3 | ₹66.25 – ₹69.24 | ₹72.4 | ₹64.03 | Consolidation • Watch EMA20 |
-| 3 | **ARIHANTCAP** | ₹85.39 | ₹82.83 – ₹91.13 | ₹96.89 | ₹80.27 | Consolidation • Watch EMA20 |
-| 4 | **MANIKA** | ₹45.6 | ₹44.23 – ₹47.18 | ₹51.7 | ₹42.86 | Oversold Dip Accumulation Zone |
-| 5 | **PARACABLES** | ₹56.65 | ₹54.95 – ₹61.81 | ₹70.84 | ₹53.25 | Oversold Dip Accumulation Zone |
+| 1 | **KMSUGAR** | ₹32.93 | ₹31.06 – ₹33.09 | ₹35.29 | ₹30.17 | Bullish Trend Continuation |
+| 2 | **ONEPOINT** | ₹74.6 | ₹70.28 – ₹74.97 | ₹79.08 | ₹66.09 | Volume Breakout • Above EMA20 |
+| 3 | **ARIHANTCAP** | ₹84.58 | ₹82.04 – ₹90.41 | ₹96.89 | ₹79.51 | Oversold Dip Accumulation Zone |
+| 4 | **SPCENET** | ₹3.21 | ₹3.11 – ₹3.5 | ₹4.75 | ₹3.02 | Consolidation • Watch EMA20 |
+| 5 | **MANIKA** | ₹46.35 | ₹44.96 – ₹47.09 | ₹51.7 | ₹43.34 | Consolidation • Watch EMA20 |
 
 ### ₹101 – ₹200
 | # | Symbol | LTP (₹) | Buy Zone | Target 1 | Stop-Loss | Setup |
 | :---: | :--- | ---: | :--- | ---: | ---: | :--- |
-| 1 | **JAMNAAUTO** | ₹129.56 | ₹125.67 – ₹135.44 | ₹154.89 | ₹121.79 | Consolidation • Watch EMA20 |
-| 2 | **ROLEXRINGS** | ₹192.03 | ₹186.27 – ₹194.14 | ₹220.0 | ₹180.51 | Consolidation • Watch EMA20 |
-| 3 | **MRPL** | ₹166.89 | ₹161.88 – ₹174.04 | ₹181.26 | ₹156.88 | Oversold Dip Accumulation Zone |
-| 4 | **MANAKCOAT** | ₹158.99 | ₹150.11 – ₹159.78 | ₹184.81 | ₹149.24 | Bullish Trend Continuation |
-| 5 | **ORIENTELEC** | ₹190.96 | ₹185.23 – ₹195.03 | ₹206.75 | ₹179.5 | Consolidation • Watch EMA20 |
+| 1 | **JAMNAAUTO** | ₹129.34 | ₹125.46 – ₹135.42 | ₹154.89 | ₹121.58 | Consolidation • Watch EMA20 |
+| 2 | **ORIENTELEC** | ₹189.52 | ₹183.83 – ₹194.89 | ₹206.75 | ₹178.15 | Consolidation • Watch EMA20 |
+| 3 | **MBAPL** | ₹198.24 | ₹183.58 – ₹199.23 | ₹210.13 | ₹184.14 | Bullish Trend Continuation |
+| 4 | **IOC** | ₹144.21 | ₹138.67 – ₹144.93 | ₹152.86 | ₹135.56 | Bullish Trend Continuation |
+| 5 | **AVTNPL** | ₹100.25 | ₹95.0 – ₹100.75 | ₹108.45 | ₹92.59 | Bullish Trend Continuation |
 
 ### ₹201 – ₹300
 | # | Symbol | LTP (₹) | Buy Zone | Target 1 | Stop-Loss | Setup |
 | :---: | :--- | ---: | :--- | ---: | ---: | :--- |
-| 1 | **LOTUSDEV** | ₹221.0 | ₹214.37 – ₹231.4 | ₹241.5 | ₹207.74 | Oversold Dip Accumulation Zone |
-| 2 | **ARHAM** | ₹211.3 | ₹204.25 – ₹212.36 | ₹232.0 | ₹194.24 | Bullish Trend Continuation |
-| 3 | **MAZDA** | ₹275.15 | ₹266.9 – ₹281.47 | ₹300.0 | ₹254.13 | Oversold Dip Accumulation Zone |
-| 4 | **SATIN** | ₹259.25 | ₹244.41 – ₹260.55 | ₹274.81 | ₹243.69 | Bullish Trend Continuation |
-| 5 | **FSL** | ₹288.15 | ₹277.42 – ₹289.59 | ₹305.44 | ₹266.54 | Bullish Trend Continuation |
+| 1 | **BONDADA** | ₹275.7 | ₹258.85 – ₹277.08 | ₹292.24 | ₹224.63 | Volume Breakout • Above EMA20 |
+| 2 | **ADANIPOWER** | ₹205.25 | ₹197.96 – ₹206.28 | ₹217.56 | ₹192.94 | Bullish Trend Continuation |
+| 3 | **SATIN** | ₹255.72 | ₹244.41 – ₹257.0 | ₹273.49 | ₹240.38 | Bullish Trend Continuation |
+| 4 | **FSL** | ₹284.4 | ₹275.87 – ₹287.36 | ₹301.46 | ₹266.54 | Consolidation • Watch EMA20 |
+| 5 | **AMANTA** | ₹208.66 | ₹202.05 – ₹209.7 | ₹245.7 | ₹196.14 | Bullish Trend Continuation |
 
 ### ₹301 – ₹400
 | # | Symbol | LTP (₹) | Buy Zone | Target 1 | Stop-Loss | Setup |
 | :---: | :--- | ---: | :--- | ---: | ---: | :--- |
-| 1 | **SURAKSHA** | ₹312.85 | ₹303.46 – ₹327.82 | ₹360.0 | ₹290.57 | Oversold Dip Accumulation Zone |
-| 2 | **MENONBE** | ₹311.95 | ₹302.59 – ₹314.86 | ₹389.9 | ₹265.41 | Oversold Dip Accumulation Zone |
-| 3 | **VRLLOG** | ₹318.55 | ₹308.99 – ₹322.12 | ₹350.3 | ₹299.44 | Consolidation • Watch EMA20 |
-| 4 | **BHAGERIA** | ₹345.3 | ₹334.94 – ₹355.67 | ₹401.0 | ₹304.56 | Consolidation • Watch EMA20 |
-| 5 | **KARURVYSYA** | ₹372.85 | ₹360.31 – ₹374.71 | ₹397.85 | ₹350.48 | Bullish Trend Continuation |
+| 1 | **MENONBE** | ₹302.8 | ₹293.72 – ₹313.98 | ₹389.9 | ₹265.41 | Oversold Dip Accumulation Zone |
+| 2 | **KARURVYSYA** | ₹371.1 | ₹359.97 – ₹373.14 | ₹397.85 | ₹348.83 | Consolidation • Watch EMA20 |
+| 3 | **SURAKSHA** | ₹311.3 | ₹301.96 – ₹326.32 | ₹355.9 | ₹290.57 | Oversold Dip Accumulation Zone |
+| 4 | **BHAGERIA** | ₹343.7 | ₹333.39 – ₹354.08 | ₹396.2 | ₹304.56 | Consolidation • Watch EMA20 |
+| 5 | **VRLLOG** | ₹314.75 | ₹305.31 – ₹321.75 | ₹350.3 | ₹295.87 | Consolidation • Watch EMA20 |
 
 ### ₹401 – ₹500
 | # | Symbol | LTP (₹) | Buy Zone | Target 1 | Stop-Loss | Setup |
 | :---: | :--- | ---: | :--- | ---: | ---: | :--- |
-| 1 | **SSWL** | ₹484.0 | ₹469.48 – ₹512.01 | ₹588.8 | ₹454.96 | Oversold Dip Accumulation Zone |
-| 2 | **MMP** | ₹451.0 | ₹436.66 – ₹453.25 | ₹483.95 | ₹418.67 | Bullish Trend Continuation |
-| 3 | **HARSHA** | ₹427.0 | ₹414.19 – ₹443.83 | ₹471.95 | ₹401.38 | Oversold Dip Accumulation Zone |
-| 4 | **SMSPHARMA** | ₹483.65 | ₹468.58 – ₹486.07 | ₹535.0 | ₹454.63 | Oversold Dip Accumulation Zone |
-| 5 | **DIFFNKG** | ₹424.6 | ₹411.86 – ₹428.85 | ₹466.2 | ₹399.12 | Consolidation • Watch EMA20 |
+| 1 | **SSWL** | ₹488.75 | ₹474.09 – ₹512.47 | ₹588.8 | ₹457.83 | Oversold Dip Accumulation Zone |
+| 2 | **DIFFNKG** | ₹427.85 | ₹413.88 – ₹429.99 | ₹466.2 | ₹402.18 | Bullish Trend Continuation |
+| 3 | **SMSPHARMA** | ₹480.5 | ₹466.08 – ₹485.19 | ₹535.0 | ₹451.67 | Oversold Dip Accumulation Zone |
+| 4 | **PANAMAPET** | ₹439.0 | ₹423.59 – ₹441.19 | ₹465.34 | ₹398.93 | Consolidation • Watch EMA20 |
+| 5 | **KRBL** | ₹414.6 | ₹396.85 – ₹416.67 | ₹442.95 | ₹389.72 | Bullish Trend Continuation |
 
 ### ₹501 – ₹600
 | # | Symbol | LTP (₹) | Buy Zone | Target 1 | Stop-Loss | Setup |
 | :---: | :--- | ---: | :--- | ---: | ---: | :--- |
-| 1 | **MATRIMONY** | ₹529.35 | ₹513.47 – ₹538.53 | ₹616.85 | ₹497.59 | Consolidation • Watch EMA20 |
-| 2 | **IIFL** | ₹599.5 | ₹581.51 – ₹615.17 | ₹682.0 | ₹563.53 | Consolidation • Watch EMA20 |
-| 3 | **JASH** | ₹511.55 | ₹496.2 – ₹531.53 | ₹567.0 | ₹480.86 | Consolidation • Watch EMA20 |
-| 4 | **GOODLUCK** | ₹513.0 | ₹497.61 – ₹535.89 | ₹576.8 | ₹482.22 | Oversold Dip Accumulation Zone |
-| 5 | **UFLEX** | ₹590.25 | ₹572.54 – ₹608.62 | ₹664.0 | ₹554.83 | Consolidation • Watch EMA20 |
+| 1 | **IIFL** | ₹598.5 | ₹580.54 – ₹615.07 | ₹682.0 | ₹562.59 | Consolidation • Watch EMA20 |
+| 2 | **MATRIMONY** | ₹527.45 | ₹511.63 – ₹538.21 | ₹585.8 | ₹495.8 | Oversold Dip Accumulation Zone |
+| 3 | **JASH** | ₹511.65 | ₹496.3 – ₹529.67 | ₹567.0 | ₹480.95 | Oversold Dip Accumulation Zone |
+| 4 | **GOODLUCK** | ₹518.1 | ₹502.56 – ₹536.38 | ₹576.8 | ₹487.01 | Oversold Dip Accumulation Zone |
+| 5 | **UFLEX** | ₹587.4 | ₹569.78 – ₹606.48 | ₹664.0 | ₹552.16 | Consolidation • Watch EMA20 |
 
 ### ₹601 – ₹700
 | # | Symbol | LTP (₹) | Buy Zone | Target 1 | Stop-Loss | Setup |
 | :---: | :--- | ---: | :--- | ---: | ---: | :--- |
-| 1 | **SGFIN** | ₹656.0 | ₹636.32 – ₹723.19 | ₹875.0 | ₹616.64 | Consolidation • Watch EMA20 |
-| 2 | **TANLA** | ₹629.9 | ₹611.0 – ₹652.82 | ₹736.5 | ₹592.11 | Consolidation • Watch EMA20 |
-| 3 | **MSTCLTD** | ₹645.1 | ₹625.75 – ₹654.48 | ₹798.65 | ₹593.96 | Consolidation • Watch EMA20 |
-| 4 | **NITINSPIN** | ₹687.95 | ₹652.06 – ₹691.39 | ₹729.23 | ₹646.67 | Bullish Trend Continuation |
-| 5 | **PRICOLLTD** | ₹609.75 | ₹591.46 – ₹656.71 | ₹758.0 | ₹573.16 | Oversold Dip Accumulation Zone |
+| 1 | **SGFIN** | ₹633.3 | ₹614.3 – ₹711.99 | ₹875.0 | ₹556.08 | Oversold Dip Accumulation Zone |
+| 2 | **TANLA** | ₹617.05 | ₹598.54 – ₹651.59 | ₹736.5 | ₹580.03 | Consolidation • Watch EMA20 |
+| 3 | **ASKAUTOLTD** | ₹625.55 | ₹603.55 – ₹628.68 | ₹663.08 | ₹588.02 | Bullish Trend Continuation |
+| 4 | **WELENT** | ₹692.75 | ₹665.23 – ₹696.21 | ₹734.32 | ₹650.25 | Oversold Dip Accumulation Zone |
+| 5 | **BALRAMCHIN** | ₹675.45 | ₹626.67 – ₹678.83 | ₹715.98 | ₹599.87 | Volume Breakout • Above EMA20 |
 
 ### ₹701 – ₹800
 | # | Symbol | LTP (₹) | Buy Zone | Target 1 | Stop-Loss | Setup |
 | :---: | :--- | ---: | :--- | ---: | ---: | :--- |
-| 1 | **TIPSMUSIC** | ₹774.7 | ₹751.46 – ₹784.72 | ₹834.5 | ₹728.22 | Consolidation • Watch EMA20 |
-| 2 | **MANINDS** | ₹705.75 | ₹684.58 – ₹767.01 | ₹879.0 | ₹663.4 | Oversold Dip Accumulation Zone |
-| 3 | **PRASOLCHEM** | ₹752.05 | ₹729.49 – ₹775.46 | ₹848.1 | ₹706.93 | Consolidation • Watch EMA20 |
-| 4 | **UNIPARTS** | ₹711.65 | ₹690.3 – ₹727.49 | ₹769.0 | ₹668.95 | Oversold Dip Accumulation Zone |
-| 5 | **KHAZANCHI** | ₹714.85 | ₹693.4 – ₹719.25 | ₹852.8 | ₹671.96 | Consolidation • Watch EMA20 |
+| 1 | **TIPSMUSIC** | ₹777.5 | ₹754.17 – ₹784.66 | ₹834.5 | ₹730.85 | Consolidation • Watch EMA20 |
+| 2 | **MINDACORP** | ₹711.55 | ₹682.79 – ₹715.11 | ₹762.85 | ₹668.86 | Bullish Trend Continuation |
+| 3 | **KHAZANCHI** | ₹708.8 | ₹687.54 – ₹718.32 | ₹852.8 | ₹666.27 | Consolidation • Watch EMA20 |
+| 4 | **GARFIBRES** | ₹734.95 | ₹710.38 – ₹738.62 | ₹779.05 | ₹682.65 | Consolidation • Watch EMA20 |
+| 5 | **UNIPARTS** | ₹705.35 | ₹684.19 – ₹726.02 | ₹769.0 | ₹663.03 | Consolidation • Watch EMA20 |
 
 ### ₹801 – ₹900
 | # | Symbol | LTP (₹) | Buy Zone | Target 1 | Stop-Loss | Setup |
 | :---: | :--- | ---: | :--- | ---: | ---: | :--- |
-| 1 | **SKYGOLD** | ₹823.9 | ₹799.18 – ₹903.41 | ₹1060.6 | ₹774.47 | Oversold Dip Accumulation Zone |
-| 2 | **TINNARUBR** | ₹890.2 | ₹850.8 – ₹894.65 | ₹993.3 | ₹795.09 | Consolidation • Watch EMA20 |
-| 3 | **ANTELOPUS** | ₹826.5 | ₹801.7 – ₹886.98 | ₹910.35 | ₹748.65 | Oversold Dip Accumulation Zone |
-| 4 | **TMB** | ₹852.35 | ₹826.78 – ₹862.45 | ₹911.95 | ₹801.21 | Consolidation • Watch EMA20 |
-| 5 | **FRACTAL** | ₹805.75 | ₹769.27 – ₹809.78 | ₹854.1 | ₹757.4 | Bullish Trend Continuation |
+| 1 | **SKYGOLD** | ₹838.5 | ₹813.35 – ₹904.8 | ₹1060.6 | ₹779.33 | Oversold Dip Accumulation Zone |
+| 2 | **TINNARUBR** | ₹896.55 | ₹852.05 – ₹901.03 | ₹993.3 | ₹795.09 | Consolidation • Watch EMA20 |
+| 3 | **ANTELOPUS** | ₹825.35 | ₹800.59 – ₹886.87 | ₹910.35 | ₹748.65 | Oversold Dip Accumulation Zone |
+| 4 | **FRACTAL** | ₹809.35 | ₹770.35 – ₹813.4 | ₹857.91 | ₹760.79 | Bullish Trend Continuation |
+| 5 | **TECHNOE** | ₹894.6 | ₹867.76 – ₹924.32 | ₹1000.0 | ₹840.92 | Oversold Dip Accumulation Zone |
 
 ### ₹901 – ₹1000
 | # | Symbol | LTP (₹) | Buy Zone | Target 1 | Stop-Loss | Setup |
 | :---: | :--- | ---: | :--- | ---: | ---: | :--- |
-| 1 | **INNOVACAP** | ₹977.4 | ₹948.08 – ₹1034.73 | ₹1180.3 | ₹918.76 | Consolidation • Watch EMA20 |
-| 2 | **INDIANB** | ₹948.4 | ₹888.49 – ₹953.14 | ₹1005.3 | ₹891.5 | Bullish Trend Continuation |
-| 3 | **SHRIRAMFIN** | ₹944.2 | ₹915.87 – ₹959.6 | ₹1024.8 | ₹887.55 | Consolidation • Watch EMA20 |
-| 4 | **TECHNOE** | ₹915.35 | ₹887.89 – ₹928.49 | ₹1024.0 | ₹860.43 | Consolidation • Watch EMA20 |
-| 5 | **WINDLAS** | ₹939.5 | ₹911.31 – ₹960.44 | ₹1030.95 | ₹883.13 | Consolidation • Watch EMA20 |
+| 1 | **SEJALLTD** | ₹934.0 | ₹853.1 – ₹938.67 | ₹990.04 | ₹809.97 | Bullish Trend Continuation |
+| 2 | **INNOVACAP** | ₹986.2 | ₹956.61 – ₹1029.74 | ₹1180.3 | ₹927.03 | Consolidation • Watch EMA20 |
+| 3 | **SHRIRAMFIN** | ₹923.5 | ₹895.79 – ₹957.62 | ₹1024.8 | ₹868.09 | Oversold Dip Accumulation Zone |
+| 4 | **INDIANB** | ₹929.85 | ₹886.78 – ₹934.5 | ₹985.64 | ₹874.06 | Bullish Trend Continuation |
+| 5 | **HINDALCO** | ₹923.0 | ₹892.04 – ₹927.61 | ₹978.38 | ₹866.11 | Consolidation • Watch EMA20 |
 
